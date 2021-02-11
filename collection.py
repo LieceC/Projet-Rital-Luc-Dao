@@ -43,6 +43,18 @@ class IndexerSimple:
         self.col = col
         self.index, self.index_inv = self.indexation(col)
         
+    def getIds(self):
+        return self.col.keys()
+    
+    def getDocSize(self,doc_id):
+        return sum(self.index[doc_id].values())
+    
+    def getMeanDocSize(self):
+        ids = self.getIds()
+        mean = 0
+        for id_doc in ids:
+            mean+=self.getDocSize(id_doc)
+        return mean/len(ids)
     
     def indexation(self,col):
         """
@@ -55,6 +67,7 @@ class IndexerSimple:
         ps = tr.PorterStemmer()
         index = {}
         index_invers = {}
+        self.nb_mots = 0
     
         for id_d,doc in col.items():
             c = ps.getTextRepresentation(doc.text)
@@ -65,6 +78,7 @@ class IndexerSimple:
                     index_invers[name][id_d] = number
                 except KeyError:
                     index_invers[name] = {id_d : number}
+                self.nb_mots += number
 
         return index, index_invers
     
@@ -91,11 +105,24 @@ class IndexerSimple:
     
     def getTfsForStem(self, terme):
         """
-        Rend un dictionnaire des documents contenant le terme et combient
-        de fois
+        Rend un dictionnaire des documents contenant le terme et combien
+        de fois il apparait
         """
-        return self.index_inv[terme]
+        try:
+            return self.index_inv[terme]
+        except KeyError: # le mot n'apparait pas
+            return dict()
     
+    def getIDFsForStem(self, terme):
+        """
+        Renvoie l'IDF du terme
+        """
+        try:
+            return math.log(1+len(self.index))-\
+                                math.log(1+len(self.index_inv[terme]))
+        except KeyError: # le mot n'apparait pas
+            return 1
+        
     def getTfIDFsForStem(self, terme):
         """
         Rend un dictionnaire des documents contenant le terme et son score
@@ -116,5 +143,6 @@ class IndexerSimple:
         Rend le text du doc id_d
         """
         return self.col[str(id_d)].text
+    
 
 
