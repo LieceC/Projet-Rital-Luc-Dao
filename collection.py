@@ -121,7 +121,8 @@ class IndexerSimple:
             return math.log(1+len(self.index))-\
                                 math.log(1+len(self.index_inv[terme]))
         except KeyError: # le mot n'apparait pas
-            return 1
+            return math.log(1+len(self.index))-\
+                                math.log(1)
         
     def getTfIDFsForStem(self, terme):
         """

@@ -42,7 +42,7 @@ class Vectoriel(IRModel):
     def __terme_doc_weight(self,id_d,t):
         try:
             return self.doc_weight[id_d][t]
-        except KeyError:
+        except KeyError: # le terme n'est pas dans le document
             return 0
         
     def getScores(self,query):
