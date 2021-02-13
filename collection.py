@@ -35,13 +35,22 @@ class Parser:
         if file[-3:] == 'rel':
             res = re.findall("(.*)\n",text,re.MULTILINE)
             for i in res :
-                tmp = np.intc(i.split())
+                tmp = np.intc(i.split()[:2])
                 try:
                     dico[tmp[0]].append(tmp[1])
                 except:
                     dico[tmp[0]] = [tmp[1]]
         else :
-            res = re.findall(r"\.I (.*)\n(.T\n(([^.].*\n)*))?(.B\n(([^.].*\n)*))?(.A\n(([^.].*\n)*))?(.K\n(([^.].*\n)*))?(.W\n(([^.].*\n)*))?(.X\n(([^.].*\n)*))?",text,re.MULTILINE)
+            
+            I = r"\.I (.*)\n"
+            T = r"(\.T\s*(([^.].*\n+)*))?"
+            B = r"(\.B\s*(([^.].*\n+)*))?"
+            A = r"(\.A\s*(([^.].*\n+)*))?"
+            K = r"(\.K\s*(([^.].*\n+)*))?"
+            W = r"(\.W\s*(([^.].*\n+)*))?"
+            X = r"(\.T\s*(([^.].*\n+)*))?"
+            
+            res = re.findall(I+T+B+A+K+W+X,text,re.MULTILINE)
             for i in res:
                 dico[i[0]] = Document(i[0],i[2],i[5],i[8],i[11],i[14],i[17])
         return dico
