@@ -12,7 +12,7 @@ import utils.TextRepresenter as tr
 import weighters as w
 import modeles as m
 import numpy as np
-from collection import Document
+from collection import Document, IndexerSimple
 
 def pretraitement_requete(q):
     ps = tr.PorterStemmer()
@@ -23,42 +23,33 @@ col0 = c.Parser.parse("data/cisi/cisi.txt")
 col1 = c.Parser.parse("data/cisi/cisi.qry")
 col2 = c.Parser.parse("data/cisi/cisi.rel")
 
+index = IndexerSimple(col0)
+
+
 import re
 file = "data/cisi/cisi.txt"
+dico = dict()
 text = open(file, "r").read()
-"""
 
 I = r"\.I (.*)\n"
 T = r"(\.T\s*(([^.].*\n+)*))?"
 B = r"(\.B\s*(([^.].*\n+)*))?"
-A = r"(\.A\s*(([^.].*\n+)*))?"
+A = r"((\.A\s*(([^.].*\n+)*))*)"
 K = r"(\.K\s*(([^.].*\n+)*))?"
 W = r"(\.W\s*(([^.].*\n+)*))?"
-X = r"(\.T\s*(([^.].*\n+)*))?"
+X = r"(\.X\s*(([^.].*\n+)*))?"
 
-res = re.findall(I+T+B+A+K+W,text,re.MULTILINE)
-#(.T\n(([^.].*\n)*))?(.B\n(([^.].*\n)*))?(.A\n(([^.].*\n)*))?(.K\n(([^.].*\n)*))?(.W\n(([^.].*\n)*))?(.X\n(([^.].*\n)*))?
-
-#res = re.findall(r"\.I (.*)",text,re.MULTILINE)
-#\n(.T\n(([^.].*\n)*))?(.B\n(([^.].*\n)*))?(.A\n(([^.].*\n)*))?(.K\n(([^.].*\n)*))?(.W\n(([^.].*\n)*))?(.X\n(([^.].*\n)*))?"col2 = c.Parser.parse(file)
-index = c.IndexerSimple(col0)
-
-dico = {}
-for i in res:
-    dico[i[0]] = Document(i[0],i[2],i[5],i[8],i[11],i[14],i[17])
-
-
-
-"""
-
-
-"""
-q = "Algorithm Comparison" # j'ai aussi test avec des mots qui n'apparaissent pas
-q = pretraitement_requete(q)
+res = re.findall(I+T+A+B+K+W+X,text,re.MULTILINE)
 
 
 model_O = m.Okapi(index, k1 = 1.2, b = 0.75)
 
+
+for id_doc in index.getIds():
+    if index.getDocSize(id_doc) == 0:
+        print(id_doc)
+
+"""
 # indices du  train et du test
 base = list(col1.items())
 train, test = ms.train_test_split(base ,test_size = 0.2)
@@ -77,4 +68,4 @@ for i in X:
             
     
     ret += sc
-"""
+    """

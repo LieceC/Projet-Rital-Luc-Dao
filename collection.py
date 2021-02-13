@@ -13,7 +13,7 @@ empty_word = ['the', 'a', 'an', 'on', 'behind', 'under', 'there', 'in', 'on']
 
 
 class Document:
-    def __init__(self, I, T = None, B = None, A = None, K = None, W = None, X = None):
+    def __init__(self, I, T = None, A = None, B = None, K = None, W = None, X = None):
         self.identifiant = I
         self.titre = T
         self.date_publication = B
@@ -45,14 +45,14 @@ class Parser:
             I = r"\.I (.*)\n"
             T = r"(\.T\s*(([^.].*\n+)*))?"
             B = r"(\.B\s*(([^.].*\n+)*))?"
-            A = r"(\.A\s*(([^.].*\n+)*))?"
+            A = r"((\.A\s*(([^.].*\n+)*))*)"
             K = r"(\.K\s*(([^.].*\n+)*))?"
             W = r"(\.W\s*(([^.].*\n+)*))?"
-            X = r"(\.T\s*(([^.].*\n+)*))?"
+            X = r"(\.X\s*(([^.].*\n+)*))?"
             
-            res = re.findall(I+T+B+A+K+W+X,text,re.MULTILINE)
+            res = re.findall(I+T+A+B+K+W+X,text,re.MULTILINE)
             for i in res:
-                dico[i[0]] = Document(i[0],i[2],i[5],i[8],i[11],i[14],i[17])
+                dico[i[0]] = Document(i[0],i[2],i[4],i[9],i[12],i[15],i[18])
         return dico
         
     
