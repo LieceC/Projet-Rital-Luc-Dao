@@ -22,14 +22,14 @@ q = pretraitement_requete(q)
 
 weighter = w.Weighter1(index)
 
-model = m.Vectoriel(index,weighter,True)
+model_V = m.Vectoriel(index,weighter,True)
 # print(model.getScores(q))
-print(model.getRanking(q))
+print(model_V.getRanking(q))
 
-model = m.ModeleLangue(index)
+model_L = m.ModeleLangue(index)
 # print(model.getScores(q))
-print(model.getRanking(q))
+print(model_L.getRanking(q))
 
-model = m.Okapi(index)
+model_O = m.Okapi(index)
 # print(model.getScores(q))
-print(model.getRanking(q))
+print(model_O.getRanking(q))

@@ -7,6 +7,7 @@ Created on Thu Jan 28 19:43:53 2021
 import re
 import utils.TextRepresenter as tr
 import math
+import numpy as np
 
 empty_word = ['the', 'a', 'an', 'on', 'behind', 'under', 'there', 'in', 'on']
 
@@ -28,11 +29,21 @@ class Parser:
         Parse la collection stockée sous la forme 
         d’un dictionnaire de Documents
         """
-        text = open(file, "r").read()
         dico = dict()
-        res = re.findall(r"\.I (.*)\n(.T\n(([^.].*\n)*))?(.B\n(([^.].*\n)*))?(.A\n(([^.].*\n)*))?(.K\n(([^.].*\n)*))?(.W\n(([^.].*\n)*))?(.X\n(([^.].*\n)*))?",text,re.MULTILINE)
-        for i in res:
-            dico[i[0]] = Document(i[0],i[2],i[5],i[8],i[11],i[14],i[17])
+        text = open(file, "r").read()
+        
+        if file[-3:] == 'rel':
+            res = re.findall("(.*)\n",text,re.MULTILINE)
+            for i in res :
+                tmp = np.intc(i.split())
+                try:
+                    dico[tmp[0]].append(tmp[1])
+                except:
+                    dico[tmp[0]] = [tmp[1]]
+        else :
+            res = re.findall(r"\.I (.*)\n(.T\n(([^.].*\n)*))?(.B\n(([^.].*\n)*))?(.A\n(([^.].*\n)*))?(.K\n(([^.].*\n)*))?(.W\n(([^.].*\n)*))?(.X\n(([^.].*\n)*))?",text,re.MULTILINE)
+            for i in res:
+                dico[i[0]] = Document(i[0],i[2],i[5],i[8],i[11],i[14],i[17])
         return dico
         
     

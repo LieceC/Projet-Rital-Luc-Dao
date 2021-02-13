@@ -11,15 +11,23 @@ import numpy as np
 class Weighter:
     def __init__(self,index):
         self.index=index
+        
     def getWeightsForDoc(self,idDoc):
+        """
+            Retourne les poids des termes pour LE document IdDoc
+        """
         pass
     def getWeightsForStem(self,stem):
+        """
+            Retourne les poids du terme stem pour TOUS les
+            documents qui le contiennent.
+        """
         pass
     
 
     def getWeightsForQuery(self,query):
         '''
-            query : dictionnaire mot - nb occurence de la requete  
+            query : dictionnaire {mot : nb occurence dans la requete }  
             renvoie le poids des termes de la requete
         '''
         pass
@@ -45,10 +53,7 @@ class Weighter2(Weighter):
         return self.index.getTfsForStem(stem)
     
     def getWeightsForQuery(self,query):
-        res = dict()
-        for term in query.keys():
-            res[term] = query[term]
-        return res
+        return query
     
 class Weighter3(Weighter):
     def getWeightsForDoc(self,idDoc):

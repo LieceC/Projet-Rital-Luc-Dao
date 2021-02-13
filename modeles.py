@@ -50,6 +50,7 @@ class Vectoriel(IRModel):
         weight_query = self.weighter.getWeightsForQuery(query)
         if self.normalized:
             norme_query = Vectoriel.__norme(weight_query.values())
+            
         for id_doc in self.index.getIds():
                 
             weight_d = {t:self.__terme_doc_weight(id_doc,t)  for t in weight_query.keys()}
@@ -57,6 +58,7 @@ class Vectoriel(IRModel):
             score[id_doc] = Vectoriel.__norme(Vectoriel.__projection(weight_query.values(), weight_d.values()))
             if self.normalized:
                 score[id_doc] /= (norme_query + self.norme_doc[id_doc])
+        
         return score
 
 # https://github.com/prdx/RetrievalModels/tree/master/models    
@@ -87,6 +89,8 @@ class ModeleLangue(IRModel):
                 if (1-self._lambda)*ptMc + self._lambda*ptMd != 0:
                     score[id_doc] += np.log((1-self._lambda)*ptMc + self._lambda*ptMd)
         return score
+    
+    
     
 class Okapi(IRModel):
     def __init__(self,index,k1=1.2,b = 0.75):
