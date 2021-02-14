@@ -48,16 +48,15 @@ class Vectoriel(IRModel):
     def getScores(self,query):
         score = dict()
         weight_query = self.weighter.getWeightsForQuery(query)
-        if self.normalized:
-            norme_query = Vectoriel.__norme(weight_query.values())
             
         for id_doc in self.index.getIds():
                 
             weight_d = {t:self.__terme_doc_weight(id_doc,t)  for t in weight_query.keys()}
-                
+            
             score[id_doc] = Vectoriel.__norme(Vectoriel.__projection(weight_query.values(), weight_d.values()))
+            
             if self.normalized:
-                score[id_doc] /= (norme_query + self.norme_doc[id_doc])
+                score[id_doc] /= (Vectoriel.__norme(weight_query.values()) + self.norme_doc[id_doc])
         
         return score
 

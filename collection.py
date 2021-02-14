@@ -33,13 +33,12 @@ class Parser:
         text = open(file, "r").read()
         
         if file[-3:] == 'rel':
-            res = re.findall("(.*)\n",text,re.MULTILINE)
+            res = re.findall("\s*([^\s]*)\s*([^\s]*)\s*([^\s]*)\s([^\s]*)\n",text,re.MULTILINE)
             for i in res :
-                tmp = np.intc(i.split()[:2])
                 try:
-                    dico[tmp[0]].append(tmp[1])
+                    dico[i[0]].append(i[1])
                 except:
-                    dico[tmp[0]] = [tmp[1]]
+                    dico[i[0]] = [i[1]]
         else :
             
             I = r"\.I (.*)\n"
