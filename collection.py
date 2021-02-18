@@ -22,38 +22,53 @@ class Document:
         self.text = W
         self.liens = X
         
+class Query:
+    def __init__(self, i, T, L):
+        self.id = i
+        self.text = T
+        self.pertinents = L
+
+
+class QueryParser:
+    def parse(f_qry, f_rel):
+        d_qry = dict()
+        res = Parser.res(f_qry)
+        for i in res:
+            d_qry[i[0]] = Query(i[0],i[2], [])
+        
+        if f_rel:
+            text = open(f_rel, "r").read()
+            res = re.findall("\s*([^\s]*)\s*([^\s]*)\s*([^\s]*)\s([^\s]*)\n",\
+                             text,re.MULTILINE)
+            for i in res :
+                d_qry[i[0]].append(i[1])
+
+        return d_qry
 
 class Parser:
-    def parse(file):
+    def res(file):
         """
         Parse la collection stockée sous la forme 
         d’un dictionnaire de Documents
         """
-        dico = dict()
         text = open(file, "r").read()
+        I = r"\.I (.*)\n"
+        T = r"(\.T\s*(([^.].*\n+)*))?"
+        B = r"(\.B\s*(([^.].*\n+)*))?"
+        A = r"((\.A\s*(([^.].*\n+)*))*)"
+        K = r"(\.K\s*(([^.].*\n+)*))?"
+        W = r"(\.W\s*(([^.].*\n+)*))?"
+        X = r"(\.X\s*(([^.].*\n+)*))?"
+        return re.findall(I+T+A+B+K+W+X,text,re.MULTILINE)
         
-        if file[-3:] == 'rel':
-            res = re.findall("\s*([^\s]*)\s*([^\s]*)\s*([^\s]*)\s([^\s]*)\n",text,re.MULTILINE)
-            for i in res :
-                try:
-                    dico[i[0]].append(i[1])
-                except:
-                    dico[i[0]] = [i[1]]
-        else :
-            
-            I = r"\.I (.*)\n"
-            T = r"(\.T\s*(([^.].*\n+)*))?"
-            B = r"(\.B\s*(([^.].*\n+)*))?"
-            A = r"((\.A\s*(([^.].*\n+)*))*)"
-            K = r"(\.K\s*(([^.].*\n+)*))?"
-            W = r"(\.W\s*(([^.].*\n+)*))?"
-            X = r"(\.X\s*(([^.].*\n+)*))?"
-            
-            res = re.findall(I+T+A+B+K+W+X,text,re.MULTILINE)
-            for i in res:
-                dico[i[0]] = Document(i[0],i[2],i[4],i[9],i[12],i[15],i[18])
+    def parse(file):
+        dico = dict()
+        res = Parser.res(file)
+        for i in res:
+            dico[i[0]] = Document(i[0],i[2],i[4],i[9],i[12],i[15],i[18])
         return dico
-        
+    
+
     
 class IndexerSimple:
     
