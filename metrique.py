@@ -26,36 +26,61 @@ class EvalIRModel:
             res += [model.evalQuery(ranking,query,args)]
             
         return np.mean(res), np.std(res)
+    
+    def precision_interpolée_graph(model,col_q, args = None):
 
 class Précision(EvalMesure):
     def evalQuery(liste, query, args = [5]):
+                '''
+            Compute the Précision at rank k
+            args[0] : k
+        '''
         return np.sum(np.isin(liste[:args[0]],query.pertinents))/args[0]
     
-    def allEvalQuery(liste,query):
+    def allEvalQuery(liste,query, args = None):
+        '''
+            Compute for all k the Query
+        '''
         return np.cumsum(np.where(np.isin(liste,query.pertinents),1,0))/\
             range(1,len(liste)+1)
     
 class Rappel(EvalMesure):
     def evalQuery(liste, query, args = [5]):
+        '''
+            Compute the Rappel at rank k
+            args[0] : k
+        '''
         if len(query.pertinents) == 0: return 1
         return np.sum(np.isin(liste[:args[0]],query.pertinents))/\
             len(query.pertinents)
             
-    def allEvalQuery(liste,query):
+    def allEvalQuery(liste,query,args = None):
+        '''
+            Compute for all k the Rappel
+        '''
         if len(query.pertinents) == 0: return [1]*len(liste)
         return np.cumsum(np.where(np.isin(liste,query.pertinents),1,0))/\
             len(query.pertinents)
     
 class F_mesure(EvalMesure):
     def evalQuery(liste,query,args = [4, 0.5]):
+        '''
+            Compute the F_mesure at rank k
+            args[0] : k
+            args[1] : beta
+        '''
         p = Précision.evalQuery(liste,query,args[0])
         r = Rappel.evalQuery(liste,query,args[0])
         return (1+args[1]**2)*(p*r)/((args[1]**2)*p+r)
     
-    def allEvalQuery(liste,query,beta=0.5):
+    def allEvalQuery(liste,query,args = [0.5]):
+        '''
+            Compute for all k the F_mesure
+            args[0] : beta
+        '''
         p = Précision.allEvalQuery(liste,query)
         r = Rappel.allEvalQuery(liste,query)
-        return (1+beta**2)*(p*r)/((beta**2)*p+r)
+        return (1+args[0]**2)*(p*r)/((args[0]**2)*p+r)
     
     
 class Précision_moyenne(EvalMesure):
@@ -70,7 +95,7 @@ class Précision_moyenne(EvalMesure):
 class reciprocal_rank(EvalMesure):
     def evalQuery(liste, query, args = None):
         """
-            querie est une liste de requêtes   
+            query est une requête 
             liste est une liste de ranking de document pour chaque requêtes
         """
         return 1/(np.where(np.isin(liste.identifiant, query.pertinents))[0][0] +1)
@@ -78,7 +103,7 @@ class reciprocal_rank(EvalMesure):
 class NDCG(EvalMesure):
     def evalQuery(liste, query, args = None):
         """
-            querie est une requêtes avec des documents pertinents 
+            query est une requêtes avec des documents pertinents 
             liste est un ranking des documents pour la requête par un modèle
         """
         r = np.where(np.isin(liste.identifiant, query.pertinents),1,0)
@@ -89,7 +114,7 @@ class NDCG(EvalMesure):
         return DCG/IDCG
     
 class Précision_interpolée(EvalMesure):
-    def evalQuery(liste,query,args=None):
+    def evalQuery(liste,query,args = None):
         p = np.array(Précision.allEvalQuery(liste,query))
 
         r = np.array(Rappel.allEvalQuery(liste,query))
