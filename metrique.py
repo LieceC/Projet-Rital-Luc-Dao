@@ -5,8 +5,15 @@ Created on Thu Feb 18 14:56:40 2021
 
 @author: dao
 """
+
+'''
+TO DO
+Prendre en compte les personnes > 1
+'''
+
 import utils.TextRepresenter as tr
 import numpy as np
+import matplotlib.pyplot as plt
 
 class EvalMesure:
     def evalQuery(liste, query, args):
@@ -22,16 +29,29 @@ class EvalIRModel:
         res = []
         for i,query in col_q.items():
             q = pretraitement_requete(query.text)
-            ranking = model.getRanking(q)
-            res += [model.evalQuery(ranking,query,args)]
+            ranking = np.array(model.getRanking(q))
+            res += [mesure.evalQuery(ranking,query,args)]
             
         return np.mean(res), np.std(res)
     
-    def precision_interpolée_graph(model,col_q, args = None):
+    def precision_interpolée_graph(model,col_q):
+        def pretraitement_requete(q):
+            ps = tr.PorterStemmer()
+            return ps.getTextRepresentation(q)
+
+        for i,query in col_q.items():
+            q = pretraitement_requete(query.text)
+            ranking = model.getRanking(q)
+            x,y = Précision_interpolée.evalQuery(ranking,query)
+
+            plt.figure()
+            plt.title("Precision Interpolée pour la requête "+query.id)
+            plt.plot(x,y)
+
 
 class Précision(EvalMesure):
     def evalQuery(liste, query, args = [5]):
-                '''
+        '''
             Compute the Précision at rank k
             args[0] : k
         '''
@@ -69,8 +89,9 @@ class F_mesure(EvalMesure):
             args[0] : k
             args[1] : beta
         '''
-        p = Précision.evalQuery(liste,query,args[0])
-        r = Rappel.evalQuery(liste,query,args[0])
+        p = Précision.evalQuery(liste,query,[args[0]])
+        r = Rappel.evalQuery(liste,query,[args[0]])
+        if p == 0 and r == 0: return 1
         return (1+args[1]**2)*(p*r)/((args[1]**2)*p+r)
     
     def allEvalQuery(liste,query,args = [0.5]):
@@ -98,7 +119,9 @@ class reciprocal_rank(EvalMesure):
             query est une requête 
             liste est une liste de ranking de document pour chaque requêtes
         """
-        return 1/(np.where(np.isin(liste.identifiant, query.pertinents))[0][0] +1)
+        ens = np.where(np.isin(liste, query.pertinents))[0]
+        if len(ens) == 0: return 0
+        return 1/(ens[0] +1)
     
 class NDCG(EvalMesure):
     def evalQuery(liste, query, args = None):
@@ -106,11 +129,13 @@ class NDCG(EvalMesure):
             query est une requêtes avec des documents pertinents 
             liste est un ranking des documents pour la requête par un modèle
         """
-        r = np.where(np.isin(liste.identifiant, query.pertinents),1,0)
-        DCG =  r[0] + np.sum(r[1:] / np.log2(np.range(2,len(r)+1)))
+        if len(query.pertinents) == 0: return 1
+        r = np.where(np.isin(liste, query.pertinents),1,0)
+        DCG =  r[0] + np.sum(r[1:] / np.log2(np.arange(2,len(r)+1)))
         
         i = np.ones(len(query.pertinents))
-        IDCG = i[0] + np.sum(r[1:] / np.log2(np.range(2,len(i)+1)))
+        
+        IDCG = i[0] + np.sum(i[1:] / np.log2(np.arange(2,len(i)+1)))
         return DCG/IDCG
     
 class Précision_interpolée(EvalMesure):

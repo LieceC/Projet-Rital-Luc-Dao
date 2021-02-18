@@ -12,6 +12,7 @@ import utils.TextRepresenter as tr
 import weighters as w
 import modeles as m
 import numpy as np
+import metrique as me
 
 def pretraitement_requete(q):
     ps = tr.PorterStemmer()
@@ -20,8 +21,24 @@ def pretraitement_requete(q):
 col0 = c.Parser.parse("data/cisi/cisi.txt")
 col1 = c.QueryParser.parse("data/cisi/cisi.qry", "data/cisi/cisi.rel")
 
-#index = IndexerSimple(col0)
+index = c.IndexerSimple(col0)
 
+#index = IndexerSimple(col0)
+weighter = w.Weighter1(index)
+
+model_V = m.Vectoriel(index,weighter,True)
+fs = [ #[ me.Précision,[5]], 
+       # [me.NDCG,None],\
+       # [me.Précision_moyenne,None],
+       # [me.Rappel,[5]],
+       # [me.reciprocal_rank,None],
+       # [me.F_mesure,[5, 0.5]]
+       ]
+for mesure,args in fs:
+    print(mesure.__name__)
+    print(me.EvalIRModel.eval(mesure,model_V,col1,args))
+
+# me.EvalIRModel.precision_interpolée_graph(model_V,col1)
 
 """
 
