@@ -69,7 +69,7 @@ class Parser:
     
 
     
-class IndexerSim0ple:
+class IndexerSimple:
     
     
     def __init__(self, col):

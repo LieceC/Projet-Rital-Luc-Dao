@@ -87,3 +87,15 @@ class NDCG(EvalMesure):
         i = np.ones(len(query.pertinents))
         IDCG = i[0] + np.sum(r[1:] / np.log2(np.range(2,len(i)+1)))
         return DCG/IDCG
+    
+class Précision_interpolée(EvalMesure):
+    def evalQuery(liste,query,args=None):
+        p = np.array(Précision.allEvalQuery(liste,query))
+
+        r = np.array(Rappel.allEvalQuery(liste,query))
+        pts,ids = np.unique(p,return_index=True)
+        values = []
+        for i in ids:
+            v = p[i]
+            values+=[np.max(r[np.where(p>=v)[0]])]
+        return pts,values
