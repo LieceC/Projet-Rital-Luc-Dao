@@ -12,19 +12,18 @@ import utils.TextRepresenter as tr
 import weighters as w
 import modeles as m
 import numpy as np
-from collection import Document, IndexerSimple
 
 def pretraitement_requete(q):
     ps = tr.PorterStemmer()
     return ps.getTextRepresentation(q)
 
-
 col0 = c.Parser.parse("data/cisi/cisi.txt")
-col1 = c.Parser.parse("data/cisi/cisi.qry")
-col2 = c.Parser.parse("data/cisi/cisi.rel")
+col1 = c.QueryParser.parse("data/cisi/cisi.qry", "data/cisi/cisi.rel")
 
-index = IndexerSimple(col0)
+#index = IndexerSimple(col0)
 
+
+"""
 
 import re
 file = "data/cisi/cisi.txt"
@@ -44,12 +43,11 @@ res = re.findall(I+T+A+B+K+W+X,text,re.MULTILINE)
 
 model_O = m.Okapi(index, k1 = 1.2, b = 0.75)
 
-"""
+
 for id_doc in index.getIds():
     if index.getDocSize(id_doc) == 0:
         print(id_doc)
 
-"""
 # indices du  train et du test
 base = list(col1.items())
 train, test = ms.train_test_split(base ,test_size = 0.2)
@@ -68,3 +66,4 @@ for i in X:
             
     
     ret += sc
+"""

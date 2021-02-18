@@ -28,21 +28,20 @@ class Query:
         self.text = T
         self.pertinents = L
 
-
 class QueryParser:
     def parse(f_qry, f_rel):
         d_qry = dict()
         res = Parser.res(f_qry)
         for i in res:
-            d_qry[i[0]] = Query(i[0],i[2], [])
+            d_qry[i[0]] = Query(i[0],i[15], [])
         
         if f_rel:
             text = open(f_rel, "r").read()
             res = re.findall("\s*([^\s]*)\s*([^\s]*)\s*([^\s]*)\s([^\s]*)\n",\
                              text,re.MULTILINE)
             for i in res :
-                d_qry[i[0]].append(i[1])
-
+                d_qry[i[0]].pertinents.append(i[1])
+                
         return d_qry
 
 class Parser:
@@ -70,7 +69,7 @@ class Parser:
     
 
     
-class IndexerSimple:
+class IndexerSim0ple:
     
     
     def __init__(self, col):
