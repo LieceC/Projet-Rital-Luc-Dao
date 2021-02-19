@@ -7,12 +7,14 @@ Created on Thu Feb 11 18:48:36 2021
 """
 
 import sklearn.model_selection as ms
-import collection as c
+import utils.collection as c
 import utils.TextRepresenter as tr
-import weighters as w
-import modeles as m
+
+import utils.weighters as w
+import utils.modeles as m
+from utils.collection import Document, IndexerSimple
 import numpy as np
-from collection import Document, IndexerSimple
+
 
 def pretraitement_requete(q):
     ps = tr.PorterStemmer()
@@ -36,7 +38,6 @@ X = np.arange(0, 1, 0.1)
 for i in X:
     model_L = m.ModeleLangue(index_txt, _lambda = i)
     sc = 0
-    
     for n, q in train:
         q = pretraitement_requete(q.text)
         tmp = model_L.getScores(q)
@@ -46,8 +47,9 @@ for i in X:
         try:
             pred = col2[n]
         except: #Il n'y a pas d'expértise pour le doc
-            pred    
+            pred = 1
         
         print(n)
         sc += tmp
     ret += sc
+    

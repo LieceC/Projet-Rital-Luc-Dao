@@ -6,10 +6,10 @@ Created on Thu Feb 11 15:10:57 2021
 @author: dao
 """
 
-import collection as c
+import utils.collection as c
 import utils.TextRepresenter as tr
-import weighters as w
-import modeles as m
+import utils.weighters as w
+import utils.modeles as m
 
 def pretraitement_requete(q):
     ps = tr.PorterStemmer()

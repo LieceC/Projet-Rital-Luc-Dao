@@ -34,6 +34,13 @@ class EvalIRModel:
             
         return np.mean(res), np.std(res)
     
+    def significativité(p_value, mesure, model, model_test, col_q, args):
+        m, std = EvalIRModel.eval(mesure, model, col_q, args)
+        m_test, m_std = EvalIRModel.eval(mesure, model, col_q, args)
+        
+        
+        
+    
     def precision_interpolée_graph(model,col_q):
         def pretraitement_requete(q):
             ps = tr.PorterStemmer()

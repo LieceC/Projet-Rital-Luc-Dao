@@ -5,7 +5,7 @@
 Ceci est un script temporaire.
 """
 
-from collection import Parser,IndexerSimple
+from utils.collection import Parser, IndexerSimple
 
 ################
 ## EXERCICE 1 ##
