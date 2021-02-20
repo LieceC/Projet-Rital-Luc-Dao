@@ -89,7 +89,7 @@ class F_mesure(EvalMesure):
         '''
         p = Précision.evalQuery(liste,query,[args[0]])
         r = Rappel.evalQuery(liste,query,[args[0]])
-        if p == 0 and r == 0: return 0
+        if ((args[1]**2)*p+r) == 0: return 0
         return (1+args[1]**2)*(p*r)/((args[1]**2)*p+r)
     
     def allEvalQuery(liste,query,args = [0.5]):
