@@ -23,7 +23,7 @@ class Document:
         self.liens = X
         
 class Query:
-    def __init__(self, i, T, L, LS):
+    def __init__(self, i, T, L = [], LS = dict()):
         self.id = i
         self.text = T
         self.pertinents = L
@@ -34,7 +34,7 @@ class QueryParser:
         d_qry = dict()
         res = Parser.res(f_qry)
         for i in res:
-            d_qry[i[0]] = Query(i[0],i[15], [], [])
+            d_qry[i[0]] = Query(i[0],i[15])
         
         if f_rel:
             text = open(f_rel, "r").read()
@@ -42,8 +42,7 @@ class QueryParser:
                              text,re.MULTILINE)
             for i in res :
                 d_qry[i[0]].pertinents.append(i[1])
-                d_qry[i[0]].pertinents_score.append(1)
-                
+                d_qry[i[0]].pertinents_score[i[1]] = 1
         return d_qry
 
 class Parser:

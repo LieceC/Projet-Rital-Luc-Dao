@@ -4,7 +4,8 @@
 
 Ceci est un script temporaire.
 """
-
+import sys
+sys.path.insert(1,"..")
 from utils.collection import Parser, IndexerSimple
 
 ################
@@ -12,7 +13,7 @@ from utils.collection import Parser, IndexerSimple
 ################
 
 
-col1 = Parser.parse('./data/cacm/cacm.qry')
+col1 = Parser.parse('../data/cacm/cacm.qry')
 
 
 ############################################################

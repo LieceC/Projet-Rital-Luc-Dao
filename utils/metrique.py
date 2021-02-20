@@ -6,11 +6,6 @@ Created on Thu Feb 18 14:56:40 2021
 @author: dao
 """
 
-'''
-TO DO
-Prendre en compte les personnes > 1
-'''
-
 import utils.TextRepresenter as tr
 import numpy as np
 import matplotlib.pyplot as plt
@@ -34,13 +29,6 @@ class EvalIRModel:
             
         return np.mean(res), np.std(res)
     
-    def significativité(p_value, mesure, model, model_test, col_q, args):
-        m, std = EvalIRModel.eval(mesure, model, col_q, args)
-        m_test, m_std = EvalIRModel.eval(mesure, model, col_q, args)
-        
-        
-        
-    
     def precision_interpolée_graph(model,col_q):
         def pretraitement_requete(q):
             ps = tr.PorterStemmer()
@@ -54,7 +42,10 @@ class EvalIRModel:
             plt.figure()
             plt.title("Precision Interpolée pour la requête "+query.id)
             plt.plot(x,y)
-
+            
+    def significativité(p_value, mesure, model, model_test, col_q, args):
+        m, std = EvalIRModel.eval(mesure, model, col_q, args)
+        m_test, m_std = EvalIRModel.eval(mesure, model_test, col_q, args)
 
 class Précision(EvalMesure):
     def evalQuery(liste, query, args = [5]):
@@ -98,7 +89,7 @@ class F_mesure(EvalMesure):
         '''
         p = Précision.evalQuery(liste,query,[args[0]])
         r = Rappel.evalQuery(liste,query,[args[0]])
-        if p == 0 and r == 0: return 1
+        if p == 0 and r == 0: return 0
         return (1+args[1]**2)*(p*r)/((args[1]**2)*p+r)
     
     def allEvalQuery(liste,query,args = [0.5]):
@@ -131,13 +122,23 @@ class reciprocal_rank(EvalMesure):
         return 1/(ens[0] +1)
     
 class NDCG(EvalMesure):
+    def __tryvalue(x,l):
+        try:
+            return l[x]
+        except KeyError:
+            return 0
+        
     def evalQuery(liste, query, args = None):
         """
             query est une requêtes avec des documents pertinents 
             liste est un ranking des documents pour la requête par un modèle
         """
         if len(query.pertinents) == 0: return 1
-        r = np.where(np.isin(liste, query.pertinents),1,0)
+       
+        r = np.array(list(
+                map(lambda x: NDCG.__tryvalue(x,query.pertinents_score),liste)
+                ))
+        #r = np.where(np.isin(liste, query.pertinents),1,0)
         DCG =  r[0] + np.sum(r[1:] / np.log2(np.arange(2,len(r)+1)))
         
         i = np.ones(len(query.pertinents))

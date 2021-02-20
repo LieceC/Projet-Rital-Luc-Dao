@@ -5,21 +5,22 @@ Created on Thu Feb 11 18:48:36 2021
 
 @author: dao
 """
-
+import sys
+sys.path.insert(1,"..")
 import sklearn.model_selection as ms
-import collection as c
+import utils.collection as c
 import utils.TextRepresenter as tr
-import weighters as w
-import modeles as m
+import utils.weighters as w
+import utils.modeles as m
 import numpy as np
-import metrique as me
+import utils.metrique as me
 
 def pretraitement_requete(q):
     ps = tr.PorterStemmer()
     return ps.getTextRepresentation(q)
 
-col0 = c.Parser.parse("data/cisi/cisi.txt")
-col1 = c.QueryParser.parse("data/cisi/cisi.qry", "data/cisi/cisi.rel")
+col0 = c.Parser.parse("../data/cisi/cisi.txt")
+col1 = c.QueryParser.parse("../data/cisi/cisi.qry", "../data/cisi/cisi.rel")
 
 index = c.IndexerSimple(col0)
 
