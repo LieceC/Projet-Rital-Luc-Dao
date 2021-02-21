@@ -16,7 +16,7 @@ def pretraitement_requete(q):
     ps = tr.PorterStemmer()
     return ps.getTextRepresentation(q)
 
-col1 = c.Parser.parse("../data/cacm/cacm.qry")
+col1 = c.Parser.parse("./data/cacm/cacm.qry")
 index = c.IndexerSimple(col1)
 q = "Algorithm Comparison" # j'ai aussi test avec des mots qui n'apparaissent pas
 q = pretraitement_requete(q)

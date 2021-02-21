@@ -9,6 +9,8 @@ Created on Thu Feb 18 14:56:40 2021
 import utils.TextRepresenter as tr
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.stats import norm
+import time
 
 class EvalMesure:
     def evalQuery(liste, query, args):
@@ -21,12 +23,13 @@ class EvalIRModel:
             ps = tr.PorterStemmer()
             return ps.getTextRepresentation(q)
         
-        res = []
-        for i,query in col_q.items():
+        def tmp(query):
             q = pretraitement_requete(query.text)
             ranking = np.array(model.getRanking(q))
-            res += [mesure.evalQuery(ranking,query,args)]
-            
+            m = mesure.evalQuery(ranking,query,args)
+            return m
+        
+        res = [tmp(i) for i in col_q.values()]
         return np.mean(res), np.std(res)
     
     def precision_interpolée_graph(model,col_q):
@@ -43,9 +46,17 @@ class EvalIRModel:
             plt.title("Precision Interpolée pour la requête "+query.id)
             plt.plot(x,y)
             
-    def significativité(p_value, mesure, model, model_test, col_q, args):
-        m, std = EvalIRModel.eval(mesure, model, col_q, args)
-        m_test, m_std = EvalIRModel.eval(mesure, model_test, col_q, args)
+    def significativité(p_value, mesure, model, model_test, col_q, args1, args2):
+        m, std = EvalIRModel.eval(mesure, model, col_q, args1)
+        m_test, std_test = EvalIRModel.eval(mesure, model_test, col_q, args2)
+
+        alpha = norm.ppf(p_value)
+        alpha = alpha*(std / np.sqrt(len(col_q)))
+        
+        if m_test >  std + alpha or m_test <  std - alpha:
+            return False
+        return True
+        
 
 class Précision(EvalMesure):
     def evalQuery(liste, query, args = [5]):
