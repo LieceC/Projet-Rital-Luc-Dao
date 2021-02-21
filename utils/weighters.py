@@ -40,10 +40,7 @@ class Weighter1(Weighter):
         return self.index.getTfsForStem(stem)
     
     def getWeightsForQuery(self,query):
-        res = dict()
-        for term in query.keys():
-            res[term] = 1
-        return res
+        return { term : 1 for term in query.keys()}
     
 class Weighter2(Weighter):
     def getWeightsForDoc(self,idDoc):
@@ -63,10 +60,7 @@ class Weighter3(Weighter):
         return self.index.getTfsForStem(stem)
     
     def getWeightsForQuery(self,query):
-        res = dict()
-        for term in query.keys():
-            res[term] = self.index.getIDFsForStem(term)
-        return res
+        return { term : self.index.getIDFsForStem(term) for term in query.keys()}
     
 class Weighter4(Weighter):
     def getWeightsForDoc(self,idDoc):
@@ -78,10 +72,7 @@ class Weighter4(Weighter):
         return {t:(1 + np.log(tfs[t])) for t in tfs.keys()}
     
     def getWeightsForQuery(self,query):
-        res = dict()
-        for term in query.keys():
-            res[term] = self.index.getIDFsForStem(term)
-        return res
+        return { term : self.index.getIDFsForStem(term) for term in query.keys()}
     
 class Weighter5(Weighter):
     def getWeightsForDoc(self,idDoc):

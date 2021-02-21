@@ -10,7 +10,7 @@ import utils.TextRepresenter as tr
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
-import time
+
 
 class EvalMesure:
     def evalQuery(liste, query, args):

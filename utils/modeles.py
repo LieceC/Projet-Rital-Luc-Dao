@@ -6,6 +6,8 @@ Created on Thu Feb 11 16:00:58 2021
 @author: dao
 """
 import numpy as np
+import time
+
 
 class IRModel:
     def __init__(self,index):
@@ -16,6 +18,7 @@ class IRModel:
     
     def getRanking(self,query):
         scores = self.getScores(query)
+        
         res = [k for k, v in sorted(scores.items(), key=lambda item: item[1])]
         res.reverse()
         return res
@@ -46,19 +49,16 @@ class Vectoriel(IRModel):
             return 0
         
     def getScores(self,query):
-        score = dict()
         weight_query = self.weighter.getWeightsForQuery(query)
-            
-        for id_doc in self.index.getIds():
-                
-            weight_d = {t:self.__terme_doc_weight(id_doc,t)  for t in weight_query.keys()}
-            
-            score[id_doc] = Vectoriel.__norme(Vectoriel.__projection(weight_query.values(), weight_d.values()))
-            
-            if self.normalized:
-                score[id_doc] /= (Vectoriel.__norme(weight_query.values()) + self.norme_doc[id_doc])
         
-        return score
+        def tmp(id_doc):
+            weight_d = {t:self.__terme_doc_weight(id_doc,t)  for t in weight_query.keys()}
+            s = Vectoriel.__norme(Vectoriel.__projection(weight_query.values(), weight_d.values()))
+            if self.normalized:
+                s /= (Vectoriel.__norme(weight_query.values()) + self.norme_doc[id_doc])
+            return s
+        
+        return {id_doc : tmp(id_doc) for id_doc in self.index.getIds() }
 
 # https://github.com/prdx/RetrievalModels/tree/master/models    
 class ModeleLangue(IRModel):
