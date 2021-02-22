@@ -17,8 +17,8 @@ def pretraitement_requete(q):
     ps = tr.PorterStemmer()
     return ps.getTextRepresentation(q)
 
-col0 = c.Parser.parse("./data/cisi/cisi.txt")
-col1 = c.QueryParser.parse("./data/cacm/cacm.qry", None)
+col0 = c.Parser.parse("../data/cisi/cisi.txt")
+col1 = c.QueryParser.parse("../data/cacm/cacm.qry", None)
 
 index = c.IndexerSimple(col0)
 
@@ -28,15 +28,20 @@ weighter = w.Weighter1(index)
 
 model_V = m.Vectoriel(index,weighter,False)
 t = time.time()
-model_V.getScores(q)
+
+print(model_V.getScores(q))
+print(model_V.getRanking(q))
+
 print(time.time() -t)
 #for model_V.getRanking(q))
-"""
+
+'''
 model_L = m.ModeleLangue(index)
-# print(model.getScores(q))
+print(model_L.getScores(q))
 print(model_L.getRanking(q))
 
+
 model_O = m.Okapi(index)
-# print(model.getScores(q))
+print(model_O.getScores(q))
 print(model_O.getRanking(q))
-"""
+'''

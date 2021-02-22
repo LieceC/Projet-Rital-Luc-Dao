@@ -7,7 +7,6 @@ Created on Thu Feb 11 18:48:36 2021
 """
 import sys
 sys.path.insert(1,"..")
-import sklearn.model_selection as ms
 import utils.collection as c
 import utils.TextRepresenter as tr
 import utils.weighters as w
@@ -19,8 +18,8 @@ def pretraitement_requete(q):
     ps = tr.PorterStemmer()
     return ps.getTextRepresentation(q)
 
-col0 = c.Parser.parse("./data/cisi/cisi.txt")
-col1 = c.QueryParser.parse("./data/cisi/cisi.qry", "./data/cisi/cisi.rel")
+col0 = c.Parser.parse("../data/cisi/cisi.txt")
+col1 = c.QueryParser.parse("../data/cisi/cisi.qry", "../data/cisi/cisi.rel")
 
 index = c.IndexerSimple(col0)
 #index = IndexerSimple(col0)

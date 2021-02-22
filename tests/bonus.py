@@ -71,10 +71,12 @@ print("score en test :", score_test)
 print("score en train :", score_train)
 '''
 
+
 score_test, score_train, best = gridsearch(col0,index_txt,col1,m.Okapi,nb_parameters = 2,range_1 = range_2,range_2 = range_2)
 print("meilleur parametre pour Okapi",best)
 print("score en test :", score_test)
 print("score en train :", score_train) 
+
 '''
 model_L = m.ModeleLangue
 print("resultat moyen ",validationcroisee(col0,index_txt,col1,model_L,n_splits=5))
