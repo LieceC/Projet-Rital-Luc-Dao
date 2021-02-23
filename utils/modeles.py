@@ -15,14 +15,18 @@ class IRModel:
         
     def getScores(self,query):
         pass
-    
+        
+    def try_catch(f,x,value):
+        try:
+            return f[x]
+        except KeyError:
+            return value
+        
     def getRanking(self,query):
         scores = self.getScores(query)
         
-        res = [k for k, v in sorted(scores.items(), key=lambda item: item[1])]
-        res.reverse()
-        return res
-        
+        return list(sorted(scores.items(), key=lambda item: item[1],reverse = True))
+
 class Vectoriel(IRModel):
 
     def __init__(self,index,weighter,normalized=False):
@@ -48,17 +52,19 @@ class Vectoriel(IRModel):
         except KeyError: # le terme n'est pas dans le document
             return 0
         
+    def getScoresDoc(self,query,id_doc,weight_query):
+        weight_d = {t:self.__terme_doc_weight(id_doc,t)  for t in weight_query.keys()}
+        s = Vectoriel.__norme(Vectoriel.__projection(weight_query.values(), weight_d.values()))
+        if self.normalized:
+            s /= (Vectoriel.__norme(weight_query.values()) + self.norme_doc[id_doc])
+        return s
+        
     def getScores(self,query):
         weight_query = self.weighter.getWeightsForQuery(query)
-        
-        def tmp(id_doc):
-            weight_d = {t:self.__terme_doc_weight(id_doc,t)  for t in weight_query.keys()}
-            s = Vectoriel.__norme(Vectoriel.__projection(weight_query.values(), weight_d.values()))
-            if self.normalized:
-                s /= (Vectoriel.__norme(weight_query.values()) + self.norme_doc[id_doc])
-            return s
-        
-        return {id_doc : tmp(id_doc) for id_doc in self.index.getIds() }
+        return dict(
+                (id_doc,self.getScoresDoc(query,id_doc,weight_query))
+                for id_doc in self.index.getIds()
+                )
 
 # https://github.com/prdx/RetrievalModels/tree/master/models    
 class ModeleLangue(IRModel):
@@ -66,29 +72,30 @@ class ModeleLangue(IRModel):
         super().__init__(index)
         self._lambda = _lambda
     
-    
+    def getScoresDoc(self,query,id_doc,tf):
+        file_size = self.index.getDocSize(id_doc)
+        res = np.array(list(map(
+                lambda x: [x[1],IRModel.try_catch(x[0],id_doc,0)]
+                ,tf)))
+        res = (1-self._lambda)*\
+            res[:,1]/file_size+\
+            self._lambda*\
+            ((res[:,0] - res[:,1])/(self.index.nb_mots - file_size))
+        return np.sum(np.where(res>0,np.log(res),0))
+        
     def getScores(self,query):
         '''
             On realise ici le Model avec un log (ne modifie pas l'ordre)
         '''
-        score = dict()
-        for id_doc in self.index.getIds():
-            score[id_doc] = 0 
-            file_size = self.index.getDocSize(id_doc)
-            for t in query.keys():
-                tft = self.index.getTfsForStem(t) # tf pour le terme t
-                try:
-                    tftdoc = tft[id_doc] # recupère celui du fichier en cours
-                except KeyError:
-                    tftdoc = 0
-                
-                # Le modele 
-                ptMc = tftdoc/file_size
-                ptMd = (sum(tft.values()) - tftdoc)/(self.index.nb_mots - file_size)
-                if (1-self._lambda)*ptMc + self._lambda*ptMd != 0:
-                    score[id_doc] += np.log((1-self._lambda)*ptMc + self._lambda*ptMd)
-        return score
-    
+        tf = np.array(list(
+                map(lambda t:
+                    [self.index.getTfsForStem(t),
+                     np.sum(list(self.index.getTfsForStem(t).values()))],
+                    query.keys())))
+        return dict(
+                (id_doc,self.getScoresDoc(query,id_doc,tf))
+                for id_doc in self.index.getIds()
+                )
     
     
 class Okapi(IRModel):
@@ -97,26 +104,25 @@ class Okapi(IRModel):
         self.k1 = k1
         self.b = b
     
+    def getScoresDoc(self,query,id_doc,tf_idf,mean_size):
+        file_size = self.index.getDocSize(id_doc)
+        res = np.array(list(map(
+                lambda x: [IRModel.try_catch(x[0],id_doc,0),IRModel.try_catch(x[1],id_doc,1)]
+                ,tf_idf)))
+        return np.sum(res[:,1]*(res[:,0]/(res[:,0]+self.k1*(1-self.b+self.b*(file_size/mean_size)))))
     
     def getScores(self,query):
         '''
             On realise ici le Model avec un log (ne modifie pas l'ordre)
         '''
+        tf_idf = np.array(list(
+                map(lambda t:
+                    [self.index.getTfsForStem(t),self.index.getTfIDFsForStem(t)],
+                    query.keys())))
         mean_size = self.index.getMeanDocSize()
-        score = dict()
-        for id_doc in self.index.getIds():
-            score[id_doc] = 0 
-            file_size = self.index.getDocSize(id_doc)
-            for t in query.keys():
-                tft = self.index.getTfsForStem(t) # tf pour le terme t
-                try:
-                    idftdoc = self.index.getTfIDFsForStem(t)[id_doc] # idf pour le terme t sur le doc
-                except KeyError:
-                    idftdoc = 1
-                try:
-                    tftdoc = tft[id_doc] # recupère celui du fichier en cours
-                except KeyError:
-                    tftdoc = 0
-                    
-                score[id_doc] += idftdoc*(tftdoc/(tftdoc+self.k1*(1-self.b+self.b*(file_size/mean_size))))
-        return score
+        return dict(
+                (id_doc,self.getScoresDoc(query,id_doc,tf_idf,mean_size))
+                for id_doc in self.index.getIds()
+                )
+
+        
