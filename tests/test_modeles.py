@@ -26,10 +26,11 @@ q = pretraitement_requete(col1['16'].text)
 
 weighter = w.Weighter1(index)
 
+
+
 model_V = m.Vectoriel(index,weighter,False)
 t = time.time()
 
-print(model_V.getScores(q))
 print(model_V.getRanking(q))
 
 print(time.time() -t)
@@ -37,11 +38,10 @@ print(time.time() -t)
 
 '''
 model_L = m.ModeleLangue(index)
-print(model_L.getScores(q))
+# print(model_L.getScores(q))
 print(model_L.getRanking(q))
 
-
 model_O = m.Okapi(index)
-print(model_O.getScores(q))
+# print(model_O.getScores(q))
 print(model_O.getRanking(q))
 '''
