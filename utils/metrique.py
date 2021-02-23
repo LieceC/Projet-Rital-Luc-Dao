@@ -18,18 +18,15 @@ class EvalMesure:
 
 
 class EvalIRModel:    
+    def eval_query(mesure,model,query,ps,args = None):
+        q = ps.getTextRepresentation(query.text)
+        ranking = np.array(model.getRanking(q))
+        m = mesure.evalQuery(ranking,query,args)
+        return m
+        
     def eval(mesure, model, col_q, args = None):
-        def pretraitement_requete(q):
-            ps = tr.PorterStemmer()
-            return ps.getTextRepresentation(q)
-        
-        def tmp(query):
-            q = pretraitement_requete(query.text)
-            ranking = np.array(model.getRanking(q))
-            m = mesure.evalQuery(ranking,query,args)
-            return m
-        
-        res = [tmp(i) for i in col_q.values()]
+        ps = tr.PorterStemmer()
+        res = list(map(lambda query: EvalIRModel.eval_query(mesure,model,query,ps,args),col_q.values()))
         return np.mean(res), np.std(res)
     
     def precision_interpolée_graph(model,col_q):
