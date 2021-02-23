@@ -21,6 +21,8 @@ class EvalIRModel:
     def eval_query(mesure,model,query,ps,args = None):
         q = ps.getTextRepresentation(query.text)
         ranking = np.array(model.getRanking(q))
+        ranking = ranking[:,0]
+    
         m = mesure.evalQuery(ranking,query,args)
         return m
         
@@ -37,6 +39,7 @@ class EvalIRModel:
         for i,query in col_q.items():
             q = pretraitement_requete(query.text)
             ranking = model.getRanking(q)
+            ranking = np.array(ranking)[:,0]
             x,y = Précision_interpolée.evalQuery(ranking,query)
 
             plt.figure()
@@ -142,7 +145,6 @@ class NDCG(EvalMesure):
             liste est un ranking des documents pour la requête par un modèle
         """
         if len(query.pertinents) == 0: return 1
-       
         r = np.array(list(
                 map(lambda x: NDCG.__tryvalue(x,query.pertinents_score),liste)
                 ))

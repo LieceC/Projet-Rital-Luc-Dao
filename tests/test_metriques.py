@@ -32,19 +32,17 @@ model_L = mod.ModeleLangue(index)
 
 
 
-fs = [ [ metr.Précision,[5]], 
-       # [metr.NDCG,None],\
+fs = [ # [ metr.Précision,[5]], 
+      [metr.NDCG,None],\
        # [metr.Précision_moyenne,None],
        # [metr.Rappel,[5]],
        # [metr.reciprocal_rank,None],
        # [metr.F_mesure,[5, 0.5]]
        ]
 
-    
-"""
 for mesure,args in fs:
     print(mesure.__name__)
     print(EvalIRModel.eval(mesure,model_V,col1,args))
-"""
+
 # me.EvalIRModel.precision_interpolée_graph(model_V,col1)
-print(EvalIRModel.significativité(95,metr.Précision,model_V,model_V,col1,[5]))
+# print(EvalIRModel.significativité(95,metr.Précision,model_V,model_V,col1,[5]))
