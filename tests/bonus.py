@@ -16,9 +16,9 @@ from utils.metrique import Précision_moyenne, EvalIRModel
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-col0 = c.Parser.parse("../data/cisi/cisi.txt")
-col1 = c.QueryParser.parse("../data/cisi/cisi.qry","../data/cisi/cisi.rel")
+base = "cisi" # cisi
+col0 = c.Parser.parse("../data/"+base+"/"+base+".txt")
+col1 = c.QueryParser.parse("../data/"+base+"/"+base+".qry", "../data/"+base+"/"+base+".rel")
 index_txt = IndexerSimple(col0)
 
 def gridsearch(coltext,index_txt,colquery,model,

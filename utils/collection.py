@@ -52,20 +52,25 @@ class Parser:
         d’un dictionnaire de Documents
         """
         text = open(file, "r").read()
-        I = r"\.I (.*)\n"
-        T = r"(\.T\s*(([^.].*\n+)*))?"
-        B = r"(\.B\s*(([^.].*\n+)*))?"
-        A = r"((\.A\s*(([^.].*\n+)*))*)"
-        K = r"(\.K\s*(([^.].*\n+)*))?"
-        W = r"(\.W\s*(([^.].*\n+)*))?"
-        X = r"(\.X\s*(([^.].*\n+)*))?"
-        return re.findall(I+T+A+B+K+W+X,text,re.MULTILINE)
+        I = r"^\.I (.*)\n"
+        T = r"^(\.T\s*(([^.].*\n+)*))?"
+        AB = r"^((\.(A|B)\s*(([^.].*\n+)*))*)"
+        K = r"^(\.K\s*(([^.].*\n+)*))?"
+        W = r"^(\.W\s*(([^.].*\n+)*))?"
+        N = r"^(\.N\s*(([^.].*\n+)*))?"
+        X = r"^(\.X\s*(([^.].*\n+)*))?"
+        return re.findall(I+T+AB+W+K+N+X,text,re.MULTILINE)
         
     def parse(file):
         dico = dict()
         res = Parser.res(file)
         for i in res:
-            dico[i[0]] = Document(i[0],i[2],i[4],i[9],i[12],i[15],i[18])
+            
+            B = re.search(r"^(\.B\s*(([^.].*\n+)*))",i[4],re.MULTILINE)
+            B = "" if B == None else B.group(2)
+            A = re.search(r"^((\.A\s*(([^.].*\n+)*))+)",i[4],re.MULTILINE)
+            A = "" if A == None else A.group(1)[3:]
+            dico[i[0]] = Document(i[0],i[2],A,B,i[13],i[10],i[19])
         return dico
     
 

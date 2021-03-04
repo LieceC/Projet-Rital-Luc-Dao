@@ -17,8 +17,10 @@ def pretraitement_requete(q):
     ps = tr.PorterStemmer()
     return ps.getTextRepresentation(q)
 
-col0 = c.Parser.parse("../data/cisi/cisi.txt")
-col1 = c.QueryParser.parse("../data/cacm/cacm.qry", None)
+base = "cisi" # cacm
+col0 = c.Parser.parse("../data/"+base+"/"+base+".txt")
+col1 = c.QueryParser.parse("../data/"+base+"/"+base+".qry", None)
+
 
 index = c.IndexerSimple(col0)
 

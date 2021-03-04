@@ -12,8 +12,8 @@ from utils.collection import Parser, IndexerSimple
 ## EXERCICE 1 ##
 ################
 
-
-col1 = Parser.parse('../data/cacm/cacm.qry')
+base = "cisi" # cacm
+col1 = Parser.parse("../data/"+base+"/"+base+".txt")
 
 
 ############################################################
