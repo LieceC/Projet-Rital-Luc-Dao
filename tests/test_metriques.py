@@ -33,7 +33,7 @@ model_L = mod.ModeleLangue(index)
 
 
 fs = [ # [ metr.Précision,[5]], 
-      [metr.NDCG,None],\
+       # [metr.NDCG,None],\
        # [metr.Précision_moyenne,None],
        # [metr.Rappel,[5]],
        # [metr.reciprocal_rank,None],

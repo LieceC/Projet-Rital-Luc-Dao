@@ -76,6 +76,7 @@ class IndexerSimple:
     def __init__(self, col):
         self.col = col
         self.index, self.index_inv = self.indexation(col)
+        self.index_ht, self.index_inv_ht = self.indexation_hyper_text(col)
         
     def getIds(self):
         return self.col.keys()
@@ -113,8 +114,29 @@ class IndexerSimple:
                 except KeyError:
                     index_invers[name] = {id_d : number}
                 self.nb_mots += number
-
         return index, index_invers
+
+    def indexation_hyper_text(self,col):
+        index = {}
+        index_invers = {}
+        for id_d,doc in col.items():
+            links = doc.liens.split('\n')
+            index[id_d] = []
+            for l in links:
+                
+                l = l.split('\t')
+                index[id_d] += [l[0]]
+                try:    
+                    index_invers[l[0]] += [id_d] 
+                except KeyError:
+                    index_invers[l[0]] = [id_d] 
+        return index, index_invers
+                
+    def getHyperlinksTo(self,id_d):
+        return self.index_inv_ht[id_d]
+    
+    def getHyperlinksFrom(self,id_d):
+        return self.index_ht[id_d]
     
     def getTfsForDoc(self, id_d):
         """
