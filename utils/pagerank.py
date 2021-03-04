@@ -5,12 +5,6 @@ Created on Thu Mar  4 15:43:28 2021
 @author: Luc
 """
 import numpy as np
-import utils.collection as c
-import utils.TextRepresenter as tr
-import utils.weighters as w
-import utils.modeles as mod
-import utils.metrique as metr
-from utils.metrique import EvalIRModel
 
 
 def sous_graph(model, query, n, k):
@@ -20,7 +14,7 @@ def sous_graph(model, query, n, k):
         Out = model.index.getHyperlinksFrom(doc)
         In  = model.index.getHyperlinksTo(doc)
         V = V.union(list(Out.keys()))
-        #V = V.union(np.random.choice(list(In.keys()), k))
+        V = V.union(np.random.choice(list(In.keys()), k))
     return V, S
     
 def page_ranking(model, S, d, nbiter_max = 100, epsilon = 1e-7):
@@ -28,23 +22,27 @@ def page_ranking(model, S, d, nbiter_max = 100, epsilon = 1e-7):
     
     p = dict()
     for doc in S:
-        nb_liens = model.index.getHyperlinksTo(doc)
-        nb_liens = np.array(list(nb_liens.items()),dtype = np.intc)
-        nb_liens = nb_liens[np.isin(nb_liens[:,0], list(S))]
-        p[doc] = sum(nb_liens[:,1])
-    
+        try :
+            nb_liens = model.index.getHyperlinksFrom(doc)
+            nb_liens = np.array(list(nb_liens.items()),dtype = np.intc)
+            nb_liens = nb_liens[np.isin(nb_liens[:,0], list(S))]
+            p[doc] = sum(nb_liens[:,1])
+        except KeyError:
+            p[doc] = 0
     
     
     for i in range(nbiter_max):    
         s_new = {i : 0 for i in S}
         for j in S:
-            In = model.index.getHyperlinksTo(j)        
-            if len(In) != 0:
+            try :
+                In = model.index.getHyperlinksTo(j)        
                 In = np.array(list(In.items()))
                 In = In[np.isin(In[:,0], list(S))]
                 for doc, nbr in In:
                     s_new[j] += (int(nbr)/p[doc])*s[doc]
-                
+            except KeyError:
+                pass
+            
             s_new[j] = s_new[j]*d + (1-d)
                     
         norm = np.sum(list(s_new.values()))
