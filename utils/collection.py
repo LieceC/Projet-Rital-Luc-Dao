@@ -121,15 +121,20 @@ class IndexerSimple:
         index_invers = {}
         for id_d,doc in col.items():
             links = doc.liens.split('\n')
-            index[id_d] = []
+            index[id_d] = dict()
             for l in links:
                 
                 l = l.split('\t')
-                index[id_d] += [l[0]]
-                try:    
-                    index_invers[l[0]] += [id_d] 
+                if l[0] == '': continue
+                try:
+                    index[id_d][l[0]] += 1
                 except KeyError:
-                    index_invers[l[0]] = [id_d] 
+                    index[id_d][l[0]] = 1
+                try:
+                    index_invers[l[0]][id_d] += 1 
+                except KeyError:
+                    index_invers[l[0]] = dict()
+                    index_invers[l[0]][id_d] = 1 
         return index, index_invers
                 
     def getHyperlinksTo(self,id_d):
