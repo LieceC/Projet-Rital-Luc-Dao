@@ -23,28 +23,30 @@ def sous_graph(model, query, n, k):
         #V = V.union(np.random.choice(list(In.keys()), k))
     return V, S
     
-def page_ranking(model, S, d, nbiter_max = 100, epsilon = 1e-3):
+def page_ranking(model, S, d, nbiter_max = 100, epsilon = 1e-7):
     s = {i : (1/len(S)) for i in S}
     
-    for i in range(nbiter_max):
-        
+    p = dict()
+    for doc in S:
+        nb_liens = model.index.getHyperlinksTo(doc)
+        nb_liens = np.array(list(nb_liens.items()),dtype = np.intc)
+        nb_liens = nb_liens[np.isin(nb_liens[:,0], list(S))]
+        p[doc] = sum(nb_liens[:,1])
+    
+    
+    
+    for i in range(nbiter_max):    
         s_new = {i : 0 for i in S}
         for j in S:
-            In = model.index.getHyperlinksTo(j)
-            
+            In = model.index.getHyperlinksTo(j)        
             if len(In) != 0:
                 In = np.array(list(In.items()))
-                print(S.intersection(In[:,0]))
                 In = In[np.isin(In[:,0], list(S))]
-                print(In)
-                
                 for doc, nbr in In:
-                    s_new[j] += (nbr/sum(In[:,1]))*s[doc]
-            else:
-                print("None")
-            s_new[j] *= d
-            s_new[j] += (1-d)
-        
+                    s_new[j] += (int(nbr)/p[doc])*s[doc]
+                
+            s_new[j] = s_new[j]*d + (1-d)
+                    
         norm = np.sum(list(s_new.values()))
         s_new = {doc : (score/norm) for doc, score in s_new.items()}
         
@@ -55,6 +57,8 @@ def page_ranking(model, S, d, nbiter_max = 100, epsilon = 1e-3):
             return s_new
         """
         s = s_new
-        print(np.max(np.abs(l1-l2)))
-        return s
-    return s
+    
+    tr = np.array(list(s.values()), dtype = np.float32)
+    sort = np.flip(np.argsort(tr))
+    
+    return np.array(list(s.keys()))[sort]

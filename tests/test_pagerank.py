@@ -33,12 +33,16 @@ model_V = m.Vectoriel(index,weighter,False)
 
 
 V, S = pr.sous_graph(model_V, q, 10, 5)
-V = list(V)
 
-cpt = np.zeros(len(V))
-for j in range(len(V)):
-    In = model_V.index.getHyperlinksTo(V[j])
+"""
+cpt = np.zeros(len(list(V)))
+for j in range(len(list(V))):
+    In = model_V.index.getHyperlinksTo(list(V)[j])
     if len(In) != 0:
         In = np.array(list(In.items()))
-        In = In[np.isin(In[:,0], V)]
+        In = In[np.isin(In[:,0], list(V))]c
         cpt[j] = len(In)
+        
+        
+"""
+rank = pr.page_ranking(model_V, V, 0.85, 100, epsilon = 1e-3)
