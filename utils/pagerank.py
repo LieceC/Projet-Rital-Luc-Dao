@@ -15,26 +15,29 @@ def sous_graph(model, query, n, k):
         In  = model.index.getHyperlinksTo(doc)
         V = V.union(list(Out.keys()))
         V = V.union(np.random.choice(list(In.keys()), k))
-    return V, S
+    return V
     
-def page_ranking(model, S, d, nbiter_max = 100, epsilon = 1e-7):
-    s = {i : (1/len(S)) for i in S}
+def page_ranking(model, query, n, k,  d, nbiter_max = 100, epsilon = 1e-100):
+    S = sous_graph(model, query, n, k)
     
+    s = dict(zip(S, [1/len(S)]*len(S)))
     p = dict()
+    
     for doc in S:
         try :
             nb_liens = model.index.getHyperlinksFrom(doc)
             nb_liens = np.array(list(nb_liens.items()),dtype = np.intc)
-            nb_liens = nb_liens[np.isin(nb_liens[:,0], list(S))]
+            tmp = np.isin(nb_liens[:,0], list(S))
+            nb_liens = nb_liens[tmp]
             p[doc] = sum(nb_liens[:,1])
-        except KeyError:
+        except (KeyError, IndexError):
             p[doc] = 0
     
-    
-    for i in range(nbiter_max):    
-        s_new = {i : 0 for i in S}
+    for i in range(nbiter_max):
+        s_new = dict(zip(S, [0]*len(S)))
+        
         for j in S:
-            try :
+            try:
                 In = model.index.getHyperlinksTo(j)        
                 In = np.array(list(In.items()))
                 In = In[np.isin(In[:,0], list(S))]
@@ -44,17 +47,19 @@ def page_ranking(model, S, d, nbiter_max = 100, epsilon = 1e-7):
                 pass
             
             s_new[j] = s_new[j]*d + (1-d)
-                    
+                
         norm = np.sum(list(s_new.values()))
-        s_new = {doc : (score/norm) for doc, score in s_new.items()}
+        for j in S:
+            s_new[j] /= norm
         
         l1 = np.array(list(s_new.values()))
         l2 = np.array(list(s.values()))
-        """
-        if np.max(np.abs(l1-l2)) < epsilon :
-            return s_new
-        """
         s = s_new
+        
+        print(np.sum(np.abs(l1-l2)))
+        if np.sum(np.abs(l1-l2)) < epsilon :
+            print('eject', i)
+            break
     
     tr = np.array(list(s.values()), dtype = np.float32)
     sort = np.flip(np.argsort(tr))
