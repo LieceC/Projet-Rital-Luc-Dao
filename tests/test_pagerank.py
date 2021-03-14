@@ -20,7 +20,7 @@ def pretraitement_requete(q):
 
 base = "cisi" # cacm
 col0 = c.Parser.parse("../data/"+base+"/"+base+".txt")
-col1 = c.QueryParser.parse("../data/"+base+"/"+base+".qry", None)
+col1 = c.QueryParser.parse("../data/"+base+"/"+base+".qry", "../data/"+base+"/"+base+".rel")
 
 
 index = c.IndexerSimple(col0)
@@ -32,5 +32,9 @@ weighter = w.Weighter1(index)
 model_V = m.Vectoriel(index,weighter,False)
 
 
-#V = pr.sous_graph(model_V, q, 10, 30)
-rank = pr.page_ranking(model_V, q, 10, 30, 0.85, epsilon = 1e-100)
+V = pr.sous_graph(model_V, q, 10, 30)
+rank1 = pr.page_ranking(model_V, q, 10, 30, 0.85, epsilon = 1e-5)
+rank2 = pr.page_ranking_dict(model_V, q, 10, 30, 0.85, epsilon = 1e-5)
+
+
+#print(EvalIRModel.eval(metr.Précision,model_V ,col1,[5]))

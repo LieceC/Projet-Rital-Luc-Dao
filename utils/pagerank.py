@@ -19,6 +19,38 @@ def sous_graph(model, query, n, k):
     
 def page_ranking(model, query, n, k,  d, nbiter_max = 100, epsilon = 1e-100):
     S = sous_graph(model, query, n, k)
+    Pi = np.ones(len(S))*(1/len(S))
+    s = list(S)
+    A = np.zeros((len(s), len(s)))
+    def find_num(x):
+        return s.index(str(x))
+    
+    for doc in S: #Création de la matrice
+        nb_liens = model.index.getHyperlinksFrom(doc)
+        nb_liens = np.array(list(nb_liens.items()),dtype = np.intc)
+        nb_liens = nb_liens[np.isin(nb_liens[:,0], s)]
+        tmp = 1/sum(nb_liens[:,1])
+        indices = list(map(find_num, nb_liens[:,0]))
+        A[find_num(doc)][indices] = nb_liens[:,1]*tmp
+            
+    for i in range(nbiter_max): #Itérations
+        P_new = np.dot(Pi, A)*d + (1-d)
+        P_new /= np.sum(P_new)
+        P_old = Pi
+        Pi  = P_new
+        print(np.sum(np.abs(P_new-P_old)))
+        if np.sum(np.abs(P_new-P_old)) < epsilon :
+            print('eject', i)
+            break
+        
+    sort = np.flip(np.argsort(Pi))
+    print(Pi)
+    return np.array(s)[sort]
+
+
+
+def page_ranking_dict(model, query, n, k,  d, nbiter_max = 100, epsilon = 1e-100):
+    S = sous_graph(model, query, n, k)
     
     s = dict(zip(S, [1/len(S)]*len(S)))
     p = dict()
@@ -61,7 +93,5 @@ def page_ranking(model, query, n, k,  d, nbiter_max = 100, epsilon = 1e-100):
             print('eject', i)
             break
     
-    tr = np.array(list(s.values()), dtype = np.float32)
-    sort = np.flip(np.argsort(tr))
-    
+    sort = np.flip(np.argsort(list(s.values())))
     return np.array(list(s.keys()))[sort]
