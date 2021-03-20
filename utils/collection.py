@@ -34,7 +34,7 @@ class QueryParser:
         d_qry = dict()
         res = Parser.res(f_qry)
         for i in res:
-            d_qry[i[0]] = Query(i[0],i[15])
+            d_qry[i[0]] = Query(i[0],i[10])
         
         if f_rel:
             text = open(f_rel, "r").read()
@@ -55,8 +55,9 @@ class Parser:
         I = r"^\.I (.*)\n"
         T = r"^(\.T\s*(([^.].*\n+)*))?"
         AB = r"^((\.(A|B)\s*(([^.].*\n+)*))*)"
-        K = r"^(\.K\s*(([^.].*\n+)*))?"
         W = r"^(\.W\s*(([^.].*\n+)*))?"
+        K = r"^(\.K\s*(([^.].*\n+)*))?"
+       
         N = r"^(\.N\s*(([^.].*\n+)*))?"
         X = r"^(\.X\s*(([^.].*\n+)*))?"
         return re.findall(I+T+AB+W+K+N+X,text,re.MULTILINE)
@@ -87,13 +88,19 @@ class IndexerSimple:
         return self.col.keys()
     
     def getDocSize(self,doc_id):
+        '''
+        Récupère la taille du document d'id doc_id
+
+        '''
         return sum(self.index[doc_id].values())
     
     def getMeanDocSize(self):
+        '''
+        Récupère la moyenne des tailles de la collection
+
+        '''
         ids = self.getIds()
-        mean = 0
-        for id_doc in ids:
-            mean+=self.getDocSize(id_doc)
+        mean = sum([self.getDocSize(id_doc) for id_doc in ids])
         return mean/len(ids)
     
     def indexation(self,col):
@@ -104,33 +111,49 @@ class IndexerSimple:
         Le second a les mots en clef et les documents et leurs nombres en
         arguments.
         """
-        ps = tr.PorterStemmer()
-        index = {}
-        index_invers = {}
-        self.nb_mots = 0
-    
-        for id_d,doc in col.items():
-            c = ps.getTextRepresentation(doc.text)
-            index[id_d] = c
-            
-            for name, number in c.items():
+        def index_doc(self,document, ps, index, index_inv):
+            '''
+                Indexation d'un document
+            '''
+            def index_doc_mot(self,id_d, item, index_invers):
+                '''
+                    Indexation d'un mot du document id_d dans l'index inverse
+                '''
+                name = item[0] # le mot 
+                number = item[1] # le nb fois ou il apparait dans le document
                 try:    
                     index_invers[name][id_d] = number
                 except KeyError:
                     index_invers[name] = {id_d : number}
                 self.nb_mots += number
+                
+            id_d = document[0]
+            doc = document[1]
+            
+            c = ps.getTextRepresentation(doc.text)
+            index[id_d] = c            
+            [index_doc_mot(self,id_d, item, index_invers) for item in c.items()]
+                
+        
+        ps = tr.PorterStemmer()
+        index = {}
+        index_invers = {}
+        self.nb_mots = 0
+    
+        [index_doc(self,x,ps,index,index_invers) for x in col.items()]
         return index, index_invers
 
     def indexation_hyper_text(self,col):
-        index = {}
-        index_invers = {}
-        for id_d,doc in col.items():
-            links = doc.liens.split('\n')
-            index[id_d] = dict()
-            
-            for l in links:
+        def indexation_hyper_text_doc(self,document, index_invers, index):
+            '''
+                Indexation des liens hyper text d'un document
+            '''
+            def indexation_hyper_text_lien(self, l, id_d, index_invers, index):
+                '''
+                    Indexation d'un lien d'un document
+                '''
                 l = l.split('\t')
-                if l[0] == '': continue
+                if l[0] == '': return
             
                 try:
                     index[id_d][l[0]] += 1
@@ -145,6 +168,15 @@ class IndexerSimple:
                     except:
                         index_invers[l[0]] = dict()
                         index_invers[l[0]][id_d] = 1
+            id_d = document[0]
+            doc = document[1]
+            links = doc.liens.split('\n')
+            index[id_d] = dict()
+            [indexation_hyper_text_lien(self, l, id_d, index_invers, index) for l in links]
+                
+        index = {}
+        index_invers = {}
+        [indexation_hyper_text_doc(self,document, index_invers, index) for document in col.items()]
                     
                     
         return index, index_invers
