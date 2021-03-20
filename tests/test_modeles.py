@@ -11,39 +11,80 @@ import utils.collection as c
 import utils.TextRepresenter as tr
 import utils.weighters as w
 import utils.modeles as m
-import time
 
 def pretraitement_requete(q):
     ps = tr.PorterStemmer()
     return ps.getTextRepresentation(q)
 
 base = "cisi" # cacm
-col0 = c.Parser.parse("../data/"+base+"/"+base+".txt")
-col1 = c.QueryParser.parse("../data/"+base+"/"+base+".qry", None)
+col0 = c.Parser.parse("./data/"+base+"/"+base+".txt")
+col1 = c.QueryParser.parse("./data/"+base+"/"+base+".qry", None)
 
 
 index = c.IndexerSimple(col0)
 
-q = pretraitement_requete(col1['16'].text)
+test_query = '1'
 
+print("query : ", col1[test_query].text)
+q = pretraitement_requete(col1[test_query].text)
+
+print("-------------------------")
+print("modele Vectoriel, Weighter1 : ")
 weighter = w.Weighter1(index)
-
-
-
 model_V = m.Vectoriel(index,weighter,False)
-t = time.time()
+ranking = model_V.getRanking(q)
+print("meilleurs score :", ranking[0][1])
+print("contenu de l'article:")
+print(col0[ranking[0][0]].text)
 
-print(model_V.getRanking(q))
+print("-------------------------")
+print("modele Vectoriel, Weighter2 : ")
+weighter = w.Weighter2(index)
+model_V = m.Vectoriel(index,weighter,False)
+ranking = model_V.getRanking(q)
+print("meilleurs score", ranking[0][1])
+print("contenu : ")
+print(col0[ranking[0][0]].text)
 
-print(time.time() -t)
-#for model_V.getRanking(q))
+print("-------------------------")
+print("modele Vectoriel, Weighter3 : ")
+weighter = w.Weighter3(index)
+model_V = m.Vectoriel(index,weighter,False)
+ranking = model_V.getRanking(q)
+print("meilleurs score", ranking[0][1])
+print("contenu : ")
+print(col0[ranking[0][0]].text)
 
-'''
+print("-------------------------")
+print("modele Vectoriel, Weighter4 : ")
+weighter = w.Weighter4(index)
+model_V = m.Vectoriel(index,weighter,False)
+ranking = model_V.getRanking(q)
+print("meilleurs score", ranking[0][1])
+print("contenu : ")
+print(col0[ranking[0][0]].text)
+
+print("-------------------------")
+print("modele Vectoriel, Weighter5 : ")
+weighter = w.Weighter5(index)
+model_V = m.Vectoriel(index,weighter,False)
+ranking = model_V.getRanking(q)
+print("meilleurs score", ranking[0][1])
+print("contenu : ")
+print(col0[ranking[0][0]].text)
+
+print("-------------------------")
+print("modele Langue : ")
 model_L = m.ModeleLangue(index)
-# print(model_L.getScores(q))
-print(model_L.getRanking(q))
+ranking = model_L.getRanking(q)
+print("meilleurs score", ranking[0][1])
+print("contenu : ")
+print(col0[ranking[0][0]].text)
 
+print("-------------------------")
+print("modele Okapi : ")
 model_O = m.Okapi(index)
-# print(model_O.getScores(q))
-print(model_O.getRanking(q))
-'''
+ranking = model_O.getRanking(q)
+print("meilleurs score", ranking[0][1])
+print("contenu : ")
+print(col0[ranking[0][0]].text)
