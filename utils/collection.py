@@ -198,14 +198,18 @@ class IndexerSimple:
         Rend un dictionnaire avec les mots du document id_d et leur
         score tf-idf
         """
-        index_d = dict()
-        for word,enum in self.index_inv.items():
+        def getTfIDFsForDoc_word(self, id_d, word, index_d):
+            """
+               Ajout d'un mot du document
+            """
             try:
                 index_d[word] = self.index[str(id_d)][word]*\
                                 (math.log(1+len(self.index))-\
                                  math.log(1+len(self.index_inv[word])))
             except KeyError:
-                continue
+                return
+        index_d = dict()
+        [getTfIDFsForDoc_word(self, id_d, word, index_d) for word in self.index_inv.keys()]            
         return index_d
     
     def getTfsForStem(self, terme):
@@ -234,14 +238,19 @@ class IndexerSimple:
         Rend un dictionnaire des documents contenant le terme et son score
         TF-IDF
         """
-        index_inv_t = dict()
-        for i,file in self.index.items():
+        def getTfIDFsForStem_doc(self,terme,i,index_inv_t):
+            """
+            TF-IDF du terme pour un document
+            """
             try:
                 index_inv_t[i] = self.index[i][terme]*\
                                  (math.log(1+len(self.index))-\
                                   math.log(1+len(self.index_inv[terme])))
             except KeyError:
-                continue
+                return
+        index_inv_t = dict()
+        [getTfIDFsForStem_doc(self,terme,i,index_inv_t) for i in self.index.keys()]
+           
         return index_inv_t
     
     def getStrDoc(self, id_d):
