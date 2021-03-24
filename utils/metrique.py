@@ -11,7 +11,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 
-
 class EvalMesure:
     def evalQuery(liste, query, args):
         pass
@@ -26,17 +25,25 @@ class EvalIRModel:
         m = mesure.evalQuery(ranking,query,args)
         return m
         
+    # renvoie la moyenne de l'erreur et sa variance
     def eval(mesure, model, col_q, args = None):
         ps = tr.PorterStemmer()
         res = list(map(lambda query: EvalIRModel.eval_query(mesure,model,query,ps,args),col_q.values()))
         return np.mean(res), np.std(res)
     
-    def precision_interpolée_graph(model,col_q):
+    # affiche le graphe de précision interpolée pour nb query de col_q
+    def precision_interpolée_graph(model,col_q,nb=0):
+        if nb == 0:
+            nb = len(col_q)
         def pretraitement_requete(q):
             ps = tr.PorterStemmer()
             return ps.getTextRepresentation(q)
-
-        for i,query in col_q.items():
+        keys = list(col_q.keys())
+        if nb != len(col_q):
+            np.random.shuffle(keys)
+        for key in keys[:nb]:
+            i = key
+            query = col_q[key]
             q = pretraitement_requete(query.text)
             ranking = model.getRanking(q)
             ranking = np.array(ranking)[:,0]
@@ -60,10 +67,13 @@ class EvalIRModel:
 
 class Précision(EvalMesure):
     def evalQuery(liste, query, args = [5]):
+        
         '''
             Compute the Précision at rank k
+            If rank 0, the rank is the number of pertinent elements
             args[0] : k
         '''
+        if args[0] == 0: args[0] = len(query.pertinents)
         return np.sum(np.isin(liste[:args[0]],query.pertinents))/args[0]
     
     def allEvalQuery(liste,query, args = None):
@@ -77,8 +87,10 @@ class Rappel(EvalMesure):
     def evalQuery(liste, query, args = [5]):
         '''
             Compute the Rappel at rank k
+            If rank 0, the rank is the number of pertinent elements
             args[0] : k
         '''
+        if args[0] == 0: args[0] = len(query.pertinents)
         if len(query.pertinents) == 0: return 1
         return np.sum(np.isin(liste[:args[0]],query.pertinents))/\
             len(query.pertinents)
@@ -95,9 +107,11 @@ class F_mesure(EvalMesure):
     def evalQuery(liste,query,args = [4, 0.5]):
         '''
             Compute the F_mesure at rank k
+            If rank 0, the rank is the number of pertinent elements
             args[0] : k
             args[1] : beta
         '''
+        if args[0] == 0: args[0] = len(query.pertinents)
         p = Précision.evalQuery(liste,query,[args[0]])
         r = Rappel.evalQuery(liste,query,[args[0]])
         if ((args[1]**2)*p+r) == 0: return 0
@@ -117,9 +131,9 @@ class Précision_moyenne(EvalMesure):
     def evalQuery(liste,query, args = None):
         R = np.where(np.isin(liste,query.pertinents),1,0)
         P = Précision.allEvalQuery(liste, query)
-        try: #Si query.pertinents vaut 0
-            return (1/len(query.pertinents))*np.sum(R*P)
-        except:
+        try: 
+            return np.sum(R*P)/len(query.pertinents)
+        except: #Si query.pertinents vide
             return 1
         
 class reciprocal_rank(EvalMesure):
