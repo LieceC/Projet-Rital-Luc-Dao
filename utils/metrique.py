@@ -35,15 +35,21 @@ class EvalIRModel:
     def precision_interpolée_graph(model,col_q,nb=0):
         if nb == 0:
             nb = len(col_q)
+            
         def pretraitement_requete(q):
             ps = tr.PorterStemmer()
             return ps.getTextRepresentation(q)
         keys = list(col_q.keys())
+    
         if nb != len(col_q):
             np.random.shuffle(keys)
-        for key in keys[:nb]:
-            i = key
-            query = col_q[key]
+        i = 0
+        while i!=nb:
+            query = col_q[keys[i]]
+            i+=1
+            if len(query.pertinents) == 0: # pas de pertinents, courbe inutile
+                continue
+            
             q = pretraitement_requete(query.text)
             ranking = model.getRanking(q)
             ranking = np.array(ranking)[:,0]
@@ -53,13 +59,15 @@ class EvalIRModel:
             plt.title("Precision Interpolée pour la requête "+query.id)
             plt.plot(x,y)
             
-    def significativité(p_value, mesure, model, model_test, col_q, args1, args2):
-        m, std = EvalIRModel.eval(mesure, model, col_q, args1)
-        m_test, std_test = EvalIRModel.eval(mesure, model_test, col_q, args2)
+    def significativité(p_value, mesure, model, model_test, col_q, args):
+        '''
+            Renvoie Faux si les modeles sont différents, Vrai sinon
+        '''
+        m, std = EvalIRModel.eval(mesure, model, col_q, args)
+        m_test, std_test = EvalIRModel.eval(mesure, model_test, col_q, args)
 
         alpha = norm.ppf(p_value)
         alpha = alpha*(std / np.sqrt(len(col_q)))
-        
         if m_test >  std + alpha or m_test <  std - alpha:
             return False
         return True
@@ -131,10 +139,10 @@ class Précision_moyenne(EvalMesure):
     def evalQuery(liste,query, args = None):
         R = np.where(np.isin(liste,query.pertinents),1,0)
         P = Précision.allEvalQuery(liste, query)
-        try: 
-            return np.sum(R*P)/len(query.pertinents)
-        except: #Si query.pertinents vide
+        if len(query.pertinents) == 0:
             return 1
+        return np.sum(R*P)/len(query.pertinents)
+
         
 class reciprocal_rank(EvalMesure):
     def evalQuery(liste, query, args = None):
