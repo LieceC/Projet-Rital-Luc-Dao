@@ -45,7 +45,10 @@ class Preprocessing:
         tokens = Preprocessing.tokenizer(x)
         if params.get("marker",False):
             tokens = np.where(np.char.isupper(tokens), "@", tokens)
-            
+        
+        if params.get("lowercase",False):
+            tokens = np.char.lower(tokens)
+        
         # si stopwords != None suppression des mots pas dans le dictionnaire
         if params.get("stopwords",False):
             tokens = [token for token in tokens if token not in params["stopwords"]]    
@@ -56,7 +59,6 @@ class Preprocessing:
         
         x = " ".join(tokens)
         
-        if params.get("lowercase",False):
-            x = x.lower()
+
             
         return x
