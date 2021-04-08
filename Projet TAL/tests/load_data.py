@@ -24,3 +24,5 @@ print(alllabs[-1])
 path = "Data/AFDmovies/movies1000/"
 alltxts,alllabs = Loader.load_movies(path)
 '''
+
+
