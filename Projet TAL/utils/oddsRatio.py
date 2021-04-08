@@ -14,13 +14,17 @@ class OddsRatioCloud:
                  singular = True, # si passage au singulier des mots 
                  lambd = 1 # on suppose lambd élément dans chaque classe
                  ):
+        
+        
+        self.datax = datax
+        self.datay = datay
+        
         self.lower = lower
         self.stopwords = stopwords
         self.letters_numbers = letters_numbers
         self.numbers = numbers
         self.min_appear = min_appear
-        self.datax = datax
-        self.datay = datay
+
         self.singular = singular
         self.lambd = lambd
         
@@ -66,6 +70,7 @@ class OddsRatioCloud:
             res += [(m,(p*(1-q))/(q*(1-p)),tot)]
         res = sorted(res, key = lambda x:x[1],reverse = True)
         return res
+    
     def print_res(self,res):
         def transforme(tab):
             res = dict()
