@@ -14,7 +14,6 @@ def load_pres(fname):
         txt = s.readline()
         if(len(txt))<5:
             break
-        #
         lab = re.sub(r"<[0-9]*:[0-9]*:(.)>.*","\\1",txt)
         txt = re.sub(r"<[0-9]*:[0-9]*:.>(.*)","\\1",txt)
         if lab.count('M') >0:
@@ -25,12 +24,10 @@ def load_pres(fname):
     return alltxts,alllabs
 
 
-fname = "AFDpresidentutf8/corpus.tache1.learn.utf8"
-
+fname = "Data/AFDpresidentutf8/corpus.tache1.learn.utf8"
 alltxts,alllabs = load_pres(fname)
 
-fname = "AFDpresidentutf8/corpus.tache1.test.utf8"
-
+fname = "Data/AFDpresidentutf8/corpus.tache1.test.utf8"
 alltxts_test,alllabs_test = load_pres(fname)
 
 print(len(alltxts),len(alllabs))
@@ -52,7 +49,5 @@ def load_movies(path2data): # 1 classe par répertoire
         
     return alltxts,labs
 
-
-path = "AFDmovies/movies1000/"
-
+path = "Data/AFDmovies/movies1000/"
 alltxts,alllabs = load_movies(path)
