@@ -84,7 +84,6 @@ def validationcroisee(coltext,index_txt,colquery,model_L,
     res_train = 0
     res_best = []
     for train, test in kf.split(list(colquery.keys())):
-        print("->")
         liste = list(colquery.keys())
         train = {liste[x]:colquery[liste[x]] for x in train}
         test = {liste[x]:colquery[liste[x]] for x in test}
@@ -105,6 +104,10 @@ range_b = np.arange(1.2, 1.7, 0.05)
 train, test = ms.train_test_split(list(col1.keys()) ,test_size = 0.8)
 
 '''
+Utilisation de la précision moyenne ici pour l'évaluation du score
+'''
+
+'''
 score_test, score_train, best = gridsearch(col0,index_txt,col1,m.ModeleLangue,test,train)
 print("meilleur parametre pour ModeleLangue",best) # 0.9
 print("score en test :", score_test) # 0.3163861722672842
@@ -120,10 +123,12 @@ print("score en train :", score_train)# 0.299986391077477
 
 '''
 model_L = m.ModeleLangue
-print("resultat moyen ",validationcroisee(col0,index_txt,col1,model_L,n_splits=5)) # 0.3164479744415069, 0.2736021751729737
+print("resultat moyen ",validationcroisee(col0,index_txt,col1,model_L,n_splits=5)) 
+# 0.3164479744415069, 0.2736021751729737
 '''
 
-
+'''
 model_L = m.Okapi
 print("resultat moyen ",validationcroisee(col0,index_txt,col1,model_L,n_splits=5,nb_parameters = 2,range_1 = range_k,range_2 = range_b))
 # 0.1 0.3
+'''

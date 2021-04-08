@@ -81,7 +81,10 @@ class Précision(EvalMesure):
             If rank 0, the rank is the number of pertinent elements
             args[0] : k
         '''
-        if args[0] == 0: args[0] = len(query.pertinents)
+        if args[0] == 0: 
+            
+            args[0] = len(query.pertinents)
+            if args[0]==0: return 1
         return np.sum(np.isin(liste[:args[0]],query.pertinents))/args[0]
     
     def allEvalQuery(liste,query, args = None):
@@ -119,7 +122,8 @@ class F_mesure(EvalMesure):
             args[0] : k
             args[1] : beta
         '''
-        if args[0] == 0: args[0] = len(query.pertinents)
+        if args[0] == 0: 
+            args[0] = len(query.pertinents)
         p = Précision.evalQuery(liste,query,[args[0]])
         r = Rappel.evalQuery(liste,query,[args[0]])
         if ((args[1]**2)*p+r) == 0: return 0
