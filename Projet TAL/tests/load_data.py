@@ -1,10 +1,3 @@
-import numpy as np
-import matplotlib.pyplot as plt
-
-import codecs
-import re
-import os.path
-
 from utils.utils import Loader
 
 fname = "Data/AFDpresidentutf8/corpus.tache1.learn.utf8"
@@ -24,3 +17,5 @@ print(alllabs[-1])
 path = "Data/AFDmovies/movies1000/"
 alltxts,alllabs = Loader.load_movies(path)
 '''
+
+
