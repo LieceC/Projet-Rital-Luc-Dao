@@ -43,6 +43,7 @@ class Preprocessing:
                     
         # --- token users
         tokens = Preprocessing.tokenizer(x)
+        
         if params.get("marker",False):
             tokens = np.where(np.char.isupper(tokens), "@", tokens)
         
@@ -58,7 +59,4 @@ class Preprocessing:
             tokens = [ps.stem(i) for i in tokens]
         
         x = " ".join(tokens)
-        
-
-            
         return x

@@ -3,6 +3,13 @@ from utils.preprocessing import Preprocessing
 from nltk.corpus import stopwords
 stop = list(stopwords.words('french'))
 
+
+import spacy
+nlp = spacy.load("fr_core_news_sm")
+from nltk.stem.snowball import SnowballStemmer
+stemmer = SnowballStemmer(language='french')
+
+
 fname = "Data/AFDpresidentutf8/corpus.tache1.learn.utf8"
 train_x,train_y = Loader.load_pres(fname)
 
