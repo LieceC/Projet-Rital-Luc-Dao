@@ -4,8 +4,8 @@ from nltk.corpus import stopwords
 stop = list(stopwords.words('french'))
 
 
-import spacy
-nlp = spacy.load("fr_core_news_sm")
+# import spacy
+# nlp = spacy.load("fr_core_news_sm")
 from nltk.stem.snowball import SnowballStemmer
 stemmer = SnowballStemmer(language='french')
 

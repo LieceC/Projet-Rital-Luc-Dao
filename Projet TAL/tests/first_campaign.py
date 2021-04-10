@@ -6,11 +6,14 @@ import sklearn.naive_bayes as nb
 from sklearn import svm
 from sklearn import linear_model as lin
 from utils.utils import Loader
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 import numpy as np
+from nltk.corpus import stopwords
+
+stop = list(stopwords.words('french'))
 
 fname = "Data/AFDpresidentutf8/corpus.tache1.learn.utf8"
 alltxts,alllabs = Loader.load_pres(fname)
-
 params = {
     "lowercase":[False,True],
     "punct":[False,"separe","fuse"],
@@ -19,11 +22,14 @@ params = {
     "stemming":[False,True],
      # "ligne": [None,-2,0],
     "strip_accents":[False,True],
-    "stopwords": [None,set(STOPWORDS)]
+    "stopwords": [None,stop], # set(STOPWORDS)],
+    "Vectorizer": [CountVectorizer,TfidfVectorizer],
+    "binary": [True,False],
+    "class_weight": ["balanced",None] 
 }
 
 # SVM => Penser à utiliser des SVM linéaire !!!!
-clf = svm.LinearSVC()
+clf = svm.LinearSVC
 # Naive Bayes
 # clf = nb.MultinomialNB() # frequentiels
 # regression logistique
