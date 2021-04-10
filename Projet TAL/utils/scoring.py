@@ -24,8 +24,29 @@ def kFold_scores(X,alllabs,clf,nb_splits = 2):
         scores += [clf.score(X_test,y_test)]
     return scores
 
-def gridSearch(datax,datay,clf,params):
+def gridSearch(datax,datay,clf_class,params):
+    '''
+    Parameters
+    ----------
+    datax
+        Liste des données.
+    datay 
+        Liste des labels des données.
+    clf_class
+        Classifieur à utiliser.
+    params
+        Dictionnaire des parametres.
+
+    Returns
+    -------
+    res_train 
+        Dictionnaire des F1-score en train en fonction des différents parametres.
+    res_test : TYPE
+        Dictionnaire des F1-score en train en fonction des différents parametres..
+
+    '''
     el = params.keys()
+ 
     res_test = dict()
     res_train = dict()
     size = len(list(itertools.product(*params.values())))
@@ -34,9 +55,18 @@ def gridSearch(datax,datay,clf,params):
         tag = tuple(x if isinstance(x, collections.Hashable) else "YES" for x in v)
         print(tag)
         current_params = dict(zip(el,v))
-        f = lambda x: Preprocessing.preprocessing(x,current_params)
-        vectorizer = CountVectorizer(preprocessor = f,lowercase=False,token_pattern = Preprocessing.token_pattern)
         
+        # choix du classifieur
+        clf = clf_class(class_weight = current_params.get("class_weight",None))
+        # choix du vectorizer
+        Vectorizer = current_params.get("Vectorizer",CountVectorizer)
+        # application des parametres au preprocessing
+        f = lambda x: Preprocessing.preprocessing(x,current_params)
+        
+        # Vectorization
+        vectorizer = Vectorizer(preprocessor = f,lowercase=False,
+                                token_pattern = Preprocessing.token_pattern, 
+                                binary = current_params.get("binary",CountVectorizer))
         X = vectorizer.fit_transform(datax)
         X_train, X_test, y_train, y_test = train_test_split( X, datay, test_size=0.4, random_state=0) 
         clf.fit(X_train, y_train)
