@@ -1,13 +1,19 @@
 from utils.utils import Loader 
 from utils.preprocessing import Preprocessing
 from nltk.corpus import stopwords
-stop = list(stopwords.words('french'))
+from nltk.stem import PorterStemmer
+from nltk.stem.snowball import FrenchStemmer
+"""
+Pour la lemmatization il faut intaller le paquet :
+python3 -m spacy download fr_core_news_md
+"""
+import spacy
+#lem = spacy.load("fr_core_news_sm")
+lem = spacy.load('fr_core_news_md')
+def lemmatization(word):    
+    return lem(str(word))[0].lemma_
 
-
-# import spacy
-# nlp = spacy.load("fr_core_news_sm")
-from nltk.stem.snowball import SnowballStemmer
-stemmer = SnowballStemmer(language='french')
+stemmer = FrenchStemmer()
 
 
 fname = "Data/AFDpresidentutf8/corpus.tache1.learn.utf8"
@@ -16,30 +22,22 @@ train_x,train_y = Loader.load_pres(fname)
 fname = "Data/AFDpresidentutf8/corpus.tache1.test.utf8"
 test_x, test_y = Loader.load_pres(fname)
 
+
+stop = list(stopwords.words('french')) + ['cet', 'cette']
 params = {
     "lowercase":True,
     "punct":True,
     "marker":True,
     "number":True,
-    "stemming":False,
+    "stemming": lemmatization, #stemmer.stem,
     "ligne": None,
     "strip_accents":True,
     "stopwords": set(stop)
 }
+i = 10000
 
-print("original :")
-print(test_x[0])
-print("result :")
-print(Preprocessing.preprocessing(test_x[0],params))
+for i in range(100, 110):
+    print("original : {}\nresult : {}\n".format(test_x[i],Preprocessing.preprocessing(test_x[i],params)))
 
-
-
-"""
 c = 'Salut, HECTOR j espere que tu vas bien moi aussi'
-
-print("original :")
-print(c)
-print("result :")
-print(Preprocessing.preprocessing(c,params))
-
-"""
+#print("original :\n{}\n\nresult :\n{}".format(c, Preprocessing.preprocessing(c,params)))

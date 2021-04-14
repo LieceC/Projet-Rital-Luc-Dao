@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import string
 import re
-from nltk.stem import PorterStemmer
 import unicodedata
 from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
@@ -18,6 +17,7 @@ class Preprocessing:
             X : Une chaine de caractère
             params: dictionnaire de paramètres, peut contenir :
             lowercase,strip_accents,marker,number,stemming,ligne,stopwords
+            stemming -> une fonction a exécuter qui prend un mot en entrée,
 
         output:
             x : La chaine de caractère traitée
@@ -29,9 +29,6 @@ class Preprocessing:
         # si ligne != None récupère la ligne indiqué
         if params.get("ligne") is not None:
             x = x.split('\n')[params["ligne"]]
-            
-        if params.get("strip_accents",False):
-            x = strip_accents(x)
             
         # si strip_accents => supprime la ponctuation
         if params.get("punct",False):
@@ -55,8 +52,11 @@ class Preprocessing:
             tokens = [token for token in tokens if token not in params["stopwords"]]    
         
         if params.get("stemming",False):
-            ps = PorterStemmer()
-            tokens = [ps.stem(i) for i in tokens]
+            tokens = [params["stemming"](i) for i in tokens]          
+        
         
         x = " ".join(tokens)
+        
+        if params.get("strip_accents",False):
+            x = strip_accents(x)
         return x
