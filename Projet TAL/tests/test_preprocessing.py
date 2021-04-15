@@ -7,11 +7,12 @@ from nltk.stem.snowball import FrenchStemmer
 Pour la lemmatization il faut intaller le paquet :
 python3 -m spacy download fr_core_news_md
 """
+from time import time
 import spacy
 #lem = spacy.load("fr_core_news_sm")
 lem = spacy.load('fr_core_news_md')
 def lemmatization(word):    
-    return lem(str(word))[0].lemma_
+    return lem(str(word))
 
 stemmer = FrenchStemmer()
 
@@ -29,15 +30,15 @@ params = {
     "punct":True,
     "marker":True,
     "number":True,
-    "stemming": lemmatization, #stemmer.stem,
+    "stemming": lem, #stemmer.stem,
     "ligne": None,
     "strip_accents":True,
     "stopwords": set(stop)
 }
 i = 10000
-
-for i in range(100, 110):
+t = time()
+for i in range(100, 101):
     print("original : {}\nresult : {}\n".format(test_x[i],Preprocessing.preprocessing(test_x[i],params)))
-
+print(time()-t)
 c = 'Salut, HECTOR j espere que tu vas bien moi aussi'
 #print("original :\n{}\n\nresult :\n{}".format(c, Preprocessing.preprocessing(c,params)))

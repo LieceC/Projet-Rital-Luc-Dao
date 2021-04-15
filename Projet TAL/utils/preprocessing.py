@@ -40,6 +40,8 @@ class Preprocessing:
                     
         # --- token users
         tokens = Preprocessing.tokenizer(x)
+        if len(tokens) == 0:
+            return ""
         
         if params.get("marker",False):
             tokens = np.where(np.char.isupper(tokens), "@", tokens)
@@ -50,13 +52,13 @@ class Preprocessing:
         # si stopwords != None suppression des mots pas dans le dictionnaire
         if params.get("stopwords",False):
             tokens = [token for token in tokens if token not in params["stopwords"]]    
-        
-        if params.get("stemming",False):
-            tokens = [params["stemming"](i) for i in tokens]          
-        
-        
+
         x = " ".join(tokens)
         
+        if params.get("stemming",False):
+            x = " ".join([i.lemma_ for i in params["stemming"](x)])
+        
+
         if params.get("strip_accents",False):
             x = strip_accents(x)
         return x
