@@ -16,7 +16,13 @@ def lemmatization(word):
 
 stemmer = FrenchStemmer()
 
+def lem(x):
+    return " ".join([i.lemma_ for i in params["stemming"](x)])
 
+def stem(x):
+    return " ".join([stemmer.stem(i) for i in x.split(' ')])
+    
+    
 fname = "Data/AFDpresidentutf8/corpus.tache1.learn.utf8"
 train_x,train_y = Loader.load_pres(fname)
 
@@ -30,7 +36,7 @@ params = {
     "punct":True,
     "marker":True,
     "number":True,
-    "stemming": lem, #stemmer.stem,
+    "stemming": stem,
     "ligne": None,
     "strip_accents":True,
     "stopwords": set(stop)

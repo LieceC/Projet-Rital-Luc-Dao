@@ -56,7 +56,7 @@ class Preprocessing:
         x = " ".join(tokens)
         
         if params.get("stemming",False):
-            x = " ".join([i.lemma_ for i in params["stemming"](x)])
+            x = params["stemming"](x)
         
 
         if params.get("strip_accents",False):
