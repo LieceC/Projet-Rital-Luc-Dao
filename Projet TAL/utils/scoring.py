@@ -8,6 +8,9 @@ from sklearn import svm
 from sklearn.model_selection import train_test_split
 from utils.preprocessing import Preprocessing
 from sklearn.feature_extraction.text import CountVectorizer
+import pickle
+import numpy as np
+import sklearn.naive_bayes as nb
 
 def kFold_scores(X,alllabs,clf,nb_splits = 2):
     scores = []
@@ -24,7 +27,7 @@ def kFold_scores(X,alllabs,clf,nb_splits = 2):
         scores += [clf.score(X_test,y_test)]
     return scores
 
-def gridSearch(datax,datay,clf_class,params):
+def gridSearch(datax,datay,params,stock = False):
     '''
     Parameters
     ----------
@@ -57,16 +60,29 @@ def gridSearch(datax,datay,clf_class,params):
         current_params = dict(zip(el,v))
         
         # choix du classifieur
-        clf = clf_class(class_weight = current_params.get("class_weight",None))
+        clf_class = current_params.get("clf",svm.LinearSVC)
+        if clf_class == nb.MultinomialNB:
+            class_prior = current_params.get("class_weight",None)
+            if class_prior == "balanced":   
+                class_prior = len(datax) / (2 * np.bincount(np.where(np.array(datay) == 1,1,0)))
+                print(class_prior)
+            clf = clf_class(class_prior = class_prior)
+        else:
+            clf = clf_class(class_weight = current_params.get("class_weight",None))
         # choix du vectorizer
         Vectorizer = current_params.get("Vectorizer",CountVectorizer)
         # application des parametres au preprocessing
         f = lambda x: Preprocessing.preprocessing(x,current_params)
         
         # Vectorization
+        print( current_params.get("max_df",1),current_params.get("min_df",1))
         vectorizer = Vectorizer(preprocessor = f,lowercase=False,
                                 token_pattern = Preprocessing.token_pattern, 
-                                binary = current_params.get("binary",CountVectorizer))
+                                binary = current_params.get("binary",False), 
+                                max_df = current_params.get("max_df",1),
+                                min_df = current_params.get("min_df",1),
+                                ngram_range = current_params.get("ngram_range",(1,1)),
+                                max_features = current_params.get("max_features",None))
         X = vectorizer.fit_transform(datax)
         X_train, X_test, y_train, y_test = train_test_split( X, datay, test_size=0.4, random_state=0) 
         clf.fit(X_train, y_train)
@@ -77,5 +93,7 @@ def gridSearch(datax,datay,clf_class,params):
         res_test[tag] = f1_score(y_test,yhat_test)
         res_train[tag] = f1_score(y_train,yhat_train)
         print(res_test[tag])
-    
+    if stock:
+        pickle.dump(res_train,open("train","wb"))
+        pickle.dump(res_test,open("test","wb"))
     return res_train,res_test

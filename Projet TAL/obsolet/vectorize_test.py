@@ -8,16 +8,20 @@ fname = "Data/AFDpresidentutf8/corpus.tache1.learn.utf8"
 alltxts,alllabs = Loader.load_pres(fname)
 
 params = {
-    "lowercase":False,
+    "lowercase":True,
+    "punct":True,
     "marker":False,
-    "number":False,
-    "stemming":False,
+    "number":True,
+    "stemming": Preprocessing.stem,
     "ligne": None,
-    "punct":False,
-    "strip_accents":False,
-    "stopwords": None
+    "strip_accents":True,
+    "stopwords": None # set(stop)
 }
+
+# 12899
 f = lambda x: Preprocessing.preprocessing(x,params)
                             
-vectorizer = CountVectorizer(preprocessor = f,lowercase=False,token_pattern = Preprocessing.token_pattern)
+vectorizer = CountVectorizer(preprocessor = f,lowercase=False,token_pattern = Preprocessing.token_pattern,min_df = 50e-6)
+
 X = vectorizer.fit_transform(alltxts)
+print(vectorizer.get_feature_names())

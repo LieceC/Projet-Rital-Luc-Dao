@@ -16,9 +16,33 @@ import matplotlib.pyplot as plt
 from time import time
 import spacy
 import numpy as np
-
+import pickle
 fname = "Data/AFDpresidentutf8/corpus.tache1.learn.utf8"
 alltxts,alllabs = Loader.load_pres(fname)
+
+params = {
+    "lowercase":[False,True],
+    "punct":[False,True],
+    "marker":[False,True],
+    "number":[False,True],
+    "stemming":[False,Preprocessing.stem],
+    "ligne": [None,-2,0],
+    "strip_accents":[False,True],
+    "stopwords": [None,stop], # set(STOPWORDS)],
+    "Vectorizer": [CountVectorizer,TfidfVectorizer],
+    "binary": [True,False],
+    "class_weight": ["balanced",None],
+    "max_features": [None, 10000, 7000],
+    "ngram_range" : [(1,1),(1,2)],
+    "max_df" : [1,0.08,0.02,0.005],
+    "min_df" : [0,10e-5,50e-6]
+}
+
+print("Meilleurs résultats en test")
+test = pickle.load(open("test","rb"))
+print(params.keys())
+maxi = np.argmax(list(test.values()))
+print(list(test.keys())[maxi])
 
 # parametres de la meilleur solution
 
