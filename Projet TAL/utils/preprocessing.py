@@ -4,11 +4,27 @@ import re
 import unicodedata
 from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
+import spacy
+from nltk.stem.snowball import FrenchStemmer
+
+
+
+
 
 
 class Preprocessing:
     token_pattern = r"(?u)\b\w\w+\b|\S+"
     tokenizer = CountVectorizer(lowercase = False,token_pattern = token_pattern).build_tokenizer()
+    stemmer = FrenchStemmer()
+    sp_lem = spacy.load('fr_core_news_md')
+    
+    
+    def lem(x):
+        return " ".join([i.lemma_ for i in Preprocessing.sp_lem(x)])
+
+    def stem(x):
+        return " ".join([Preprocessing.stemmer.stem(i) for i in x.split(' ')])
+
 
     # ligne : -2 = resumé, ligne = 0 : titre
     def preprocessing(x,params = dict()):

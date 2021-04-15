@@ -1,28 +1,11 @@
 from utils.utils import Loader 
 from utils.preprocessing import Preprocessing
 from nltk.corpus import stopwords
-from nltk.stem import PorterStemmer
-from nltk.stem.snowball import FrenchStemmer
+from time import time
 """
 Pour la lemmatization il faut intaller le paquet :
 python3 -m spacy download fr_core_news_md
 """
-from time import time
-import spacy
-#lem = spacy.load("fr_core_news_sm")
-lem = spacy.load('fr_core_news_md')
-def lemmatization(word):    
-    return lem(str(word))
-
-stemmer = FrenchStemmer()
-
-def lem(x):
-    return " ".join([i.lemma_ for i in params["stemming"](x)])
-
-def stem(x):
-    return " ".join([stemmer.stem(i) for i in x.split(' ')])
-    
-    
 fname = "Data/AFDpresidentutf8/corpus.tache1.learn.utf8"
 train_x,train_y = Loader.load_pres(fname)
 
@@ -30,13 +13,13 @@ fname = "Data/AFDpresidentutf8/corpus.tache1.test.utf8"
 test_x, test_y = Loader.load_pres(fname)
 
 
-stop = list(stopwords.words('french')) + ['cet', 'cette']
+stop = list(stopwords.words('french')) + ['cet', 'cette', 'là']
 params = {
     "lowercase":True,
     "punct":True,
     "marker":True,
     "number":True,
-    "stemming": stem,
+    "stemming": Preprocessing.stem, #lem,
     "ligne": None,
     "strip_accents":True,
     "stopwords": set(stop)
