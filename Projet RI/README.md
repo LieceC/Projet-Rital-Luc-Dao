@@ -13,3 +13,25 @@ De plus nous avons tester la cohérence avec les TFs et IDFs des termes que nous
 Durant nos tests nous avons observé un bug dans TextRepresenter que nous avons corrigé. 
 En effet si un mot apparaissait sous 2 formes différentes mais avec un même stem il n'apparaissait qu'une fois pour le stemmer.
 ## TME2-Appariement
+Les modèles sont codés dans le code modeles.py et les weighters dans le code weighters.py, 
+la totalité des modèles sont opérationnels.  
+Le modèle de langue est inspiré du code [ici](https://github.com/prdx/RetrievalModels/tree/master/models) (on passe le modèle au log ici).
+Il existe 2 fichiers de tests :  
+- test_modeles.py qui test la cohérence des résultats obtenus dans l'application réel en affichant la requète avec le meilleurs score pour une query avec les différents models.  
+Nous utilisons aussi ces tests pour verifier la rapidité du ranking (il est de l'ordre de 0.1 seconde, ce qui est très bon).
+- test_modeles_results.py qui vérifie les résultats obtenues sur une collection réduite et une query prédéfinie.  
+Nous avons réalisé de plus réalisé le bonus pour obtenir les meilleurs paramètres de nos modèles.  
+## TME3-Evaluation
+
+## TME4-Algorithme de PageRank
+## Répartition du travail
+TME1-Indexation Code : Luc STERKERS - Dao THAUVIN   
+TME1-Indexation Tests : Dao THAUVIN   
+TME2-Appariement Code : Luc STERKERS - Dao THAUVIN    
+TME2-Appariement Tests : Dao THAUVIN  
+TME2-Appariement Bonus : Dao THAUVIN    
+TME3-Evaluation Code : Luc STERKERS - Dao THAUVIN  
+TME3-Evaluation Tests : Dao THAUVIN  
+TME3-Evaluation Bonus : Luc STERKERS  
+TME4-Algorithme de PageRank Code : Luc STERKERS  
+TME4-Algorithme de PageRank Tests : Luc STERKERS  

@@ -56,7 +56,7 @@ class Vectoriel(IRModel):
         weight_d = {t:self.__terme_doc_weight(id_doc,t)  for t in weight_query.keys()}
         s = Vectoriel.__norme(Vectoriel.__projection(weight_query.values(), weight_d.values()))
         if self.normalized:
-            s /= (Vectoriel.__norme(weight_query.values()) + self.norme_doc[id_doc])
+            s /= (Vectoriel.__norme(weight_query.values()) * self.norme_doc[id_doc])
         return s
         
     def getScores(self,query):
@@ -81,6 +81,7 @@ class ModeleLangue(IRModel):
             res[:,1]/file_size+\
             self._lambda*\
             ((res[:,0] - res[:,1])/(self.index.nb_mots - file_size))
+        
         return np.sum(np.where(res>0,np.log(res),0))
         
     def getScores(self,query):
@@ -107,7 +108,7 @@ class Okapi(IRModel):
     def getScoresDoc(self,query,id_doc,tf_idf,mean_size):
         file_size = self.index.getDocSize(id_doc)
         res = np.array(list(map(
-                lambda x: [IRModel.try_catch(x[0],id_doc,0),IRModel.try_catch(x[1],id_doc,1)]
+                lambda x: [IRModel.try_catch(x[0],id_doc,0),x[1]]
                 ,tf_idf)))
         return np.sum(res[:,1]*(res[:,0]/(res[:,0]+self.k1*(1-self.b+self.b*(file_size/mean_size)))))
     
@@ -117,7 +118,7 @@ class Okapi(IRModel):
         '''
         tf_idf = np.array(list(
                 map(lambda t:
-                    [self.index.getTfsForStem(t),self.index.getTfIDFsForStem(t)],
+                    [self.index.getTfsForStem(t),self.index.getIDFsForStem(t)],
                     query.keys())))
         mean_size = self.index.getMeanDocSize()
         return dict(

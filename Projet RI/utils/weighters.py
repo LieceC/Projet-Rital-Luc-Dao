@@ -77,12 +77,12 @@ class Weighter4(Weighter):
 class Weighter5(Weighter):
     def getWeightsForDoc(self,idDoc):
         tfs = self.index.getTfsForDoc(idDoc)
-        idf = self.index.getIDFsForStem(idDoc)
-        return {t:(1 + np.log(tfs[t]))*idf for t in tfs.keys()}
+        return {t:(1 + np.log(tfs[t]))*self.index.getIDFsForStem(t) for t in tfs.keys()}
     
     def getWeightsForStem(self,stem):
         tfs = self.index.getTfsForStem(stem)
         idf = self.index.getIDFsForStem(stem)
+        
         return {t:(1 + np.log(tfs[t]))*idf for t in tfs.keys()}
     
     def getWeightsForQuery(self,query):
