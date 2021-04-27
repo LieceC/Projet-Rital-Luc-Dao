@@ -30,21 +30,23 @@ class TextRepresenter(object):
 
 class PorterStemmer(TextRepresenter):
     
-    def __init__(self):
+    def __init__(self,stopwords = None):
         '''
         Constructor
         '''
         self.stopWords=set()
-        self._setStopWords()
+        if stopwords is None:
+            self._setStopWords()
+        else:
+            self.stopWords = stopwords
         
     def getTextRepresentation(self,text):
         tab=re.findall(r"\w+",text,re.UNICODE)
         
-        tab=[i.lower() for i in tab]
+        tab=[utils.porter.stem(i.lower()) for i in tab if i.lower() not in self.stopWords]
         
         ret=Counter(tab)
-        
-        ret={utils.porter.stem(a):b for (a,b) in ret.items()  if a not in self.stopWords}
+        ret={a:b for (a,b) in ret.items()  if a not in self.stopWords}
         return ret
 
         

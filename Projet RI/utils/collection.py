@@ -7,10 +7,6 @@ Created on Thu Jan 28 19:43:53 2021
 import re
 import utils.TextRepresenter as tr
 import math
-import numpy as np
-
-empty_word = ['the', 'a', 'an', 'on', 'behind', 'under', 'there', 'in', 'on']
-
 
 class Document:
     def __init__(self, I, T = None, A = None, B = None, K = None, W = None, X = None):
@@ -80,10 +76,17 @@ class Parser:
 class IndexerSimple:
     
     
-    def __init__(self, col):
+    def __init__(self, col, stopwords = None):
+        """
+        ajout d'une liste de stopwords, 
+        si celui-ci n'est pas donnée, celui du TextRepresenter est utilisé
+
+        """
         self.col = col
+        self.stopwords = stopwords
         self.index, self.index_inv = self.indexation(col)
         self.index_ht, self.index_inv_ht = self.indexation_hyper_text(col)
+
         
     def getIds(self):
         return self.col.keys()
@@ -136,7 +139,7 @@ class IndexerSimple:
             [index_doc_mot(self,id_d, item, index_invers) for item in c.items()]
                 
         
-        ps = tr.PorterStemmer()
+        ps = tr.PorterStemmer(self.stopwords)
         index = {}
         index_invers = {}
         self.nb_mots = 0
@@ -171,9 +174,10 @@ class IndexerSimple:
                         index_invers[l[0]][id_d] = 1
             id_d = document[0]
             doc = document[1]
-            links = doc.liens.split('\n')
             index[id_d] = dict()
-            [indexation_hyper_text_lien(self, l, id_d, index_invers, index) for l in links]
+            if doc.liens is not None:
+                links = doc.liens.split('\n')
+                [indexation_hyper_text_lien(self, l, id_d, index_invers, index) for l in links]
                 
         index = {}
         index_invers = {}
@@ -247,6 +251,7 @@ class IndexerSimple:
                 index_inv_t[i] = self.index[i][terme]*\
                                  (math.log(1+len(self.index))-\
                                   math.log(1+len(self.index_inv[terme])))
+                
             except KeyError:
                 return
         index_inv_t = dict()
